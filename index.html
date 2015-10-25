@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>ready</title>
+  <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="stylesheets/style.css" />
+    <link rel="stylesheet" href="stylesheets/jquery.terminal.css" />
+  <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?skin=desert"></script>
+	<script src="javascripts/ace/src/ace.js"></script>
+	<script src="javascripts/jquery-1.11.3.min.js"></script>
+	<script src="javascripts/jquery.terminal-0.8.8.js"></script>
+  <script src="browser_transform.js"></script>
+
+  <script style="display: none;" id="bootstrap"  type="javascript/bootstrap">
+  // This script won't be parsed by JS engines because its type is javascript/bootstrap.
+
+  // Ready. Bootstrap
+
+  var _input_queue = [];
+
+  function* read()
+  {
+    while(_input_queue.length == 0)
+    {
+      yield 0;
+    }
+    return _input_queue.shift();
+  }
+
+  function* write(msg)
+  {
+    __machine.echo(msg);
+  }
+
+  function* clear()
+  {
+    term.clear();
+  }
+
+  function* random(min, max)
+  {
+    return Math.floor(Math.random()*(max-min+1))+min;
+  }
+
+  __machine.echo("Welcome to Ready, 1.0");
+  __machine.echo("RAM: " + __machine.statementCapacity + "   CPU: " + __machine.clockSpeedHz + "hz    GPU: n/a     SND: n/a      GFX: n/a");
+  __machine.echo("Have fun!");
+  __machine.echo("");
+  __machine.echo("ready");
+    
+  </script>
+
+
+  <script src="main.js"></script>
+</head>
+<body>
+  <span id="helpButtonOpen" class="fa fa-question-circle helpButton"></span>
+  <span id="taskButtonOpen" class="fa fa-rocket helpButton taskButton"></span>
+  <div class="helpPane">
+    <h2>ready</h2>
+    <span id="helpButtonClose" class="helpButton fa fa-close helpButton"></span>
+    <div id="tasks">
+      <p>Complete some of these tasks to upgrade your computer!</p>
+      <h3>Warm up [RAM unlock]</h3>
+      <ul id="tasklist">
+      </ul>
+      <h3>Number cruncher [CPU unlock]</h3>
+      <h3>Algorithm 101 [.. unlock]</h3>
+      <h3>String parties [.. unlock]</h3>
+      <h3>..</h3>
+    </div>
+    <div id="help">
+    <p>Congratulations with your new computer. We hope you enjoy it. Read this manual carefully and you will have many hours of fun.</p>
+    <h3>Commands</h3>
+    <dl>
+    <dt>help</dt><dd>Show list of known commands.</dd>
+    <dt>clear</dt><dd>Clear the screen.</dd>
+    <dt>reset</dt><dd>Resets the computer. All unsaved data is lost.</dd>
+    <dt>run</dt><dd>Runs the program currently in the editor window.</dd>
+    </dl>
+    <h3>JavaScript</h3>
+    <p>The language used to program your computer is JavaScript. Here is some example code:</p>
+    <pre class="prettyprint">
+var a = "";       // strings
+var b = 17;       // texts
+var c = [7,9,13]; // array
+
+for(var i = 1; i < 10; i++)
+{
+  c.push(b*i);
+}
+    </pre>
+    <h3>API</h3>
+    <pre class="prettyprint">
+write(str);   // write string to screen
+read();       // read and return a line of text from user
+clear();      // clear the screen
+    </pre>
+    </div>
+  </div>
+  <div id="container">
+  	<h1 id="title"><span id="title1">r</span>eady</h1>
+  	<div id="left-col">
+  		<div id="screen"></div>
+      <div id="debugout" class="terminal"></div>
+  	</div>
+  	<div id="right-col">
+      <div id="saver"><i class="fa fa-asterisk"></i></div>
+  		<div id="editor"></div>
+      <div class="taskareaBig">
+        <div class="taskarea">
+          <i class="fa fa-close taskClose"></i>
+          <div id="taskbox">
+            <div id="tasktitle"></div>
+            <div id="taskdescription"></div>
+            <div id="taskstatus">Not solved</div>
+          </div>
+        </div>
+      </div>
+  	</div>
+  </div>
+</body>
+</html>

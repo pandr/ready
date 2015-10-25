@@ -1,0 +1,193 @@
+body {
+  padding: 10px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  background: radial-gradient(transparent, black), url('../images/circuit.jpg');
+  background-size: cover;
+}
+
+
+
+a {
+  color: #00B7FF;
+}
+
+#container {
+  width: 1024px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#editor {
+  width: 400px;
+  height: 400px;
+  box-shadow: 0px 0px 3px #444;
+  border: 1px solid #aaa;
+}
+
+.taskClose {
+  position:absolute;
+  right: 0px;
+  z-index: 3;
+}
+
+#taskbox {
+  width: 390px;
+  height: 100px;
+  border: 1px solid #aaa;
+  background: #272822;
+  color: white;
+  padding: 5px;
+  position: relative;
+}
+
+.taskareaBig {
+  position: relative;
+  width: 400px;
+  color: white;
+}
+
+.taskarea {
+  width: 400px;
+  position: relative;
+  margin-top: 5px;
+  -webkit-transform-origin: 100% 50%;
+  -webkit-transform: scaleX(0.00001);
+  -webkit-transition: -webkit-transform 0.2s ease-in-out;
+  -moz-transform-origin: 100% 50%;
+  -moz-transform: scaleX(0.00001);
+  -moz-transition: -moz-transform 0.2s ease-in-out;
+}
+
+.taskareaVisible {
+  -webkit-transform: scaleX(1);
+  -moz-transform: scaleX(1);
+}
+
+#tasktitle {
+  font-weight: bold;
+}
+
+#taskstatus {
+  font-size: 20px;
+  position: absolute;
+  bottom: 0px;
+}
+
+.taskstatusSolved {
+  color: rgb(20,200,20);
+}
+.taskstatusUnsolved {
+  color: rgb(200,20,20);
+}
+
+pre.prettyprint {
+  border: 1px solid #aaa;
+  padding: 5px;
+}
+
+#debugout {
+  width: 600px;
+  height: 16px;
+  border: 1px solid #585;
+  margin-top: 5px;
+  display: none;
+}
+
+#screen {
+  width: 600px;
+  height: 400px;
+  border: 1px solid #aaa;
+  box-shadow: 0px 0px 3px #444;
+}
+
+#left-col {
+  float: left;
+}
+
+#right-col {
+  float: right;
+}
+
+#title {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+  color: rgb(26, 144, 15);
+}
+
+.helpPane {
+  position: fixed;
+  right: 0;
+  width: 350px;
+  top: 0;
+  bottom: 0;
+  box-shadow: 0px 0px 10px black;
+  background: #272822;
+  padding: 10px;
+  color: white;
+  -webkit-transform-origin: 100% 50%;
+  -webkit-transform: scaleX(0.00001);
+  -webkit-transition: -webkit-transform 0.2s ease-in-out;
+  -moz-transform-origin: 100% 50%;
+  -moz-transform: scaleX(0.00001);
+  -moz-transition: -moz-transform 0.2s ease-in-out;
+  outline: 0;
+  z-index: 2;
+  overflow: scroll;
+}
+
+.helpPane a:link {color: #888; text-decoration: none; }
+.helpPane a:active {color: #aaa; text-decoration: none; }
+.helpPane a:visited {color: #888; text-decoration: none; }
+.helpPane a:hover {color: #fff; text-decoration: underline; }
+
+.helpPaneVisible {
+  -webkit-transform: scaleX(1);
+  -moz-transform: scaleX(1);
+}
+
+.helpButton {
+  position: fixed;
+  right: 15px;
+  top: 15px;
+  font-size: 24px;
+  color: white;
+  z-index: 2;
+  cursor: pointer;
+}
+
+.taskButton {
+  top: 50px;
+}
+
+#tasklist {
+  list-style: none;
+}
+
+#tasklist li {
+  cursor: pointer;
+}
+
+#tasklist li::before {
+  font-family: 'FontAwesome';
+  content: '\f096';
+  margin: 0 5px 0 -15px;
+  display: inline-block;
+  width: 14px;
+}
+
+#tasklist li.solved::before {
+  content: '\f046';
+  color: #291;
+}
+
+#saver {
+  position: relative;
+  display: none;
+}
+#saver i {
+  position: absolute;
+  right: 0px;
+  top: -10px;
+  color: #aaa;
+  font-size: 8px;
+}
+
