@@ -118,7 +118,6 @@
 
     Machine.prototype.echo = function(msg)
     {
-      //this.contextwindow.term.echo(msg);
       var out = this.attachedOutputs;
       for(var i = 0; i < out.length; i++)
       {
@@ -167,9 +166,12 @@
 
     Machine.prototype.stop = function()
     {
+      if(this.running)
+      {
+        clearInterval(this.intervalId);
+        this.onDone();
+      }
       this.running = false;
-      clearInterval(this.intervalId);
-      this.onDone();
       this.echo("ready");
       //this.echo("Finished in " + this.__runner.stepcount + " steps")
     }
@@ -184,10 +186,6 @@
 
     function setupRuntime(machine)
     {
-      //var blob = new Blob([
-        //document.querySelector('#worker1').textContent
-      //], { type: "text/javascript" })
-
       var boot = document.querySelector('#bootstrap').textContent;
       machine.context.evaluate(boot);
 
@@ -217,9 +215,35 @@
     Task.prototype.preRun = function(machine)
     {
       var task = this;
+      $('#stream0').html("");
+
+      // If no outputChecker defined, make a default from outputCheck
+      if(task.task.outputChecker) {
+        this.checker = new task.task.outputChecker();
+      }
+      else {
+        this.checker = new function() {
+          this.i = 0;
+          this.ok = false;
+          this.check = function(m) {
+            this.i++;
+            this.ok = (this.i == 1 && task.task.outputCheck(m));
+            return this.ok;
+          }
+          this.completed = function() { return this.ok; };
+        }
+      }
+      var checker = this.checker;
+
       this.outputChecker = function (m) {
-        var ok = task.task.outputCheck(m);
-        task.completed = task.completed || ok;
+        var ok = checker.check(m);
+        $("#stream0").append('<span class="'+(ok ? 'output_ok' : 'output_not_ok')+'">'+m+'</span>'+"\n");
+        var s = $('#stream0');
+        s.scrollTop(s.prop("scrollHeight"));
+        if(!ok)
+        {
+          machine.stop();
+        }
       }
       machine.attachOutput(this.outputChecker);
     }
@@ -227,54 +251,30 @@
     Task.prototype.postRun = function(machine)
     {
       machine.detachOutput(this.outputChecker);
-      if(this.completed)
+      if(this.checker.completed())
       {
-        machine.echo("Task completed!");
+        this.completed = true;
+        machine.echo("[Task completed!]");
       }
       else
       {
-        machine.echo("Task failed");
+        machine.echo("[Task failed]");
       }
     }
 
     function TaskDatabase()
     {
       this._load();
-      this.tasks = [
-        {
-          'id': 'm00t00',
-          'name': 'Say hello',
-          'description': 'Write a program that prints "Hello, World" on the screen',
-          'outputCheck': function(m) {
-            return (/^hello, world/i).test(m);
-          }
-        },
-        {
-          'id': 'm00t01',
-          'name': 'Do math I',
-          'description': 'Write a program that prints the result of 1379 * 7728',
-          'outputCheck': function(m) {
-            return parseInt(m) == 1379*7728;
-          }
-        },
-        {
-          'id': 'm00t02',
-          'name': 'Do math II',
-          'description': 'Print the sum of all numbers less than 1000. So you must calculate 1 + 2 + ... + 999',
-          'outputCheck': function(m) {
-            return parseInt(m) == 499500;
-          }
-        },
-        {
-          'id': 'm00t03',
-          'name': 'Do math III (Euler 1)',
-          'description': 'If we list all the natural numbers below 10 that are multiples of 3 or 5, we get 3, 5, 6 and 9. The sum of these multiples is 23.'+
-            'Find the sum of all multiplies of 3 and 5 below 100.',
-          'outputCheck': function(m) {
-            return parseInt(m) == 2318;
-          }
-        }
-      ];
+      this.tasks = [];
+      var t = this;
+      $.get("tasks.js", function(data) {
+        t.add_tasks(eval(data));
+      });
+    }
+
+    TaskDatabase.prototype.add_tasks = function(tasks)
+    {
+      this.tasks = this.tasks.concat(tasks);
     }
 
     TaskDatabase.prototype._load = function()
@@ -345,7 +345,7 @@
         {
           greetings: "",
           name: "ready",
-          prompt: ""
+          prompt: "> "
         }
       );
 
@@ -374,7 +374,7 @@
           else
           {
             var task = new Task(current_task);
-            term.echo("Testing: " + task.getName());
+            term.echo("[Testing: " + task.getName()+"]");
             var preRun = function() { task.preRun(machine); };
             var postRun = function() {
               task.postRun(machine);
@@ -389,7 +389,6 @@
         else if(command == 'reset')
         {
           term.clear();
-          term.set_prompt("");
           clear_task();
           machine = create_machine(term);
         }
@@ -432,8 +431,9 @@
           else
           {
             machine.exec(tcode.code);
-            machine.run(function() { postRun(); });
+            machine.run(function() { postRun(); term.set_prompt("> ");});
             preRun(); // TODO: wire up input/output
+            term.set_prompt("");
           }
         }
         catch (e) {
@@ -444,7 +444,7 @@
       function set_task_solved(task_id)
       {
         taskdatabase.set_solved(task_id);
-        set_task(task_id);
+        update_task_status(task_id);
       }
 
       function set_task(task_id)
@@ -462,16 +462,23 @@
         $('#tasktitle').text(task.name);
         $('#taskdescription').text(task.description);
         $('.taskarea').addClass("taskareaVisible");
+        $('#stream0-container').fadeIn();
+        $('#stream0').html("");
+        update_task_status(task_id);
+      }
+
+      function update_task_status(task_id)
+      {
         var solved = taskdatabase.is_solved(task_id);
         if(solved)
         {
-          $('#taskstatus').text(task.id+": Solved")
+          $('#taskstatus').text(task_id+": Solved")
           $('#taskstatus').addClass("taskstatusSolved");
           $('#taskstatus').removeClass("taskstatusUnsolved");
         }
         else
         {
-          $('#taskstatus').text(task.id+": Not solved")
+          $('#taskstatus').text(task_id+": Not solved")
           $('#taskstatus').addClass("taskstatusUnsolved");
           $('#taskstatus').removeClass("taskstatusSolved");
         }
@@ -485,6 +492,7 @@
         $('#tasktitle').text("");
         $('#taskdescription').text("");
         $('.taskarea').removeClass("taskareaVisible");
+        $('#stream0-container').fadeOut();
       }
 
       function handle_input(command)

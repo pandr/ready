@@ -72,7 +72,7 @@
     <div id="help">
     <p>Congratulations with your new computer. We hope you enjoy it. Read this manual carefully and you will have many hours of fun.</p>
     <h3>Commands</h3>
-    <dl>
+    <dl class="helpdl">
     <dt>help</dt><dd>Show list of known commands.</dd>
     <dt>clear</dt><dd>Clear the screen.</dd>
     <dt>reset</dt><dd>Resets the computer. All unsaved data is lost.</dd>
@@ -103,6 +103,10 @@ clear();      // clear the screen
   	<div id="left-col">
   		<div id="screen"></div>
       <div id="debugout" class="terminal"></div>
+      <div id="stream0-container">
+        <div class="stream-caption">output checker</div>
+        <div id="stream0" class="terminal"></div>
+      </div>
   	</div>
   	<div id="right-col">
       <div id="saver"><i class="fa fa-asterisk"></i></div>

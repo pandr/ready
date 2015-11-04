@@ -93,6 +93,54 @@ pre.prettyprint {
   display: none;
 }
 
+#stream0-container {
+  width: 200px;
+  display: none;
+}
+
+#stream0 {
+  height: 50px;
+  border: 1px solid #585;
+  margin-top: 5px;
+  white-space: pre;
+  margin: 0px;
+}
+
+.stream-caption {
+  margin-left: 40px;
+  width: 120px;
+  background: #262;
+  text-align: center;
+  color: #ccc;
+}
+
+#stream0 span.output_ok {
+  color: rgb(20,200,20);
+  margin-left: 20px;
+}
+#stream0 span.output_ok:before {
+  font-family: 'FontAwesome';
+  content: '\f164';
+  margin: 0 5px 0 -15px;
+  display: inline-block;
+  font-size: 12px;
+  width: 12px;
+  color: #888;
+}
+#stream0 span.output_not_ok {
+  color: rgb(20,200,20);
+  margin-left: 20px;
+}
+#stream0 span.output_not_ok:before {
+  font-family: 'FontAwesome';
+  content: '\f165';
+  margin: 0 5px 0 -15px;
+  display: inline-block;
+  font-size: 12px;
+  width: 12px;
+  color: #e22;
+}
+
 #screen {
   width: 600px;
   height: 400px;
@@ -191,3 +239,22 @@ pre.prettyprint {
   font-size: 8px;
 }
 
+dl.helpdl {
+
+}
+
+dl.helpdl dt {
+  float: left;
+  clear: left;
+  width: 50px;
+  text-align: right;
+  font-weight: bold;
+}
+dl.helpdl dt:after {
+  content: ":";
+}
+dl.helpdl dd {
+  margin: 0 0 0 70px;
+  padding: 0px;
+}
+}
