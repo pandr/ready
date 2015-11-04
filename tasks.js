@@ -16,11 +16,45 @@
     }
   },
   {
+    'id': 'numseq1',
+    'name': 'Number sequence',
+    'description': 'Write a program that prints the numbers from 1 to 100 (inclusive)',
+    'outputChecker': function() {
+      this.i = 0;
+      this.check = function(m) {
+        this.i++;
+        return this.i <= 100 && (parseInt(m) == this.i); 
+      }
+      this.completed = function() {
+        return this.i == 100;
+      }
+    }
+  },
+  {
     'id': 'sumlt100',
     'name': 'Do math II',
     'description': 'Print the sum of all numbers less than 100. So you must calculate 1 + 2 + ... + 99',
     'outputCheck': function(m) {
       return parseInt(m) == 4950;
+    }
+  },
+  {
+    'id': 'numseq2',
+    'name': 'Fibonacci',
+    'description': 'The Fibonacci sequence is the numbers 1, 1, 2, 3, 5, 8, ... where each number is the sum of the two previous numbers. Write a program that prints the first 25 numbers from this sequence.',
+    'outputChecker': function() {
+      this.i = 0;
+      this.f = 1;
+      this.p = 0;
+      this.check = function(m) {
+        this.i++;
+	this.f = this.f + this.p;
+	this.p = this.f - this.p;
+        return this.i <= 25 && (parseInt(m) == this.f); 
+      }
+      this.completed = function() {
+        return this.i == 25;
+      }
     }
   },
   {
@@ -41,19 +75,4 @@
       return parseInt(m) == 2318;
     }
   },
-  {
-    'id': 'numseq1',
-    'name': 'Number sequence',
-    'description': 'Write a program that prints the numbers from 1 to 100 (inclusive)',
-    'outputChecker': function() {
-      this.i = 0;
-      this.check = function(m) {
-        this.i++;
-        return this.i <= 100 && (parseInt(m) == this.i); 
-      }
-      this.completed = function() {
-        return this.i == 100;
-      }
-    }
-  }
 ];

@@ -106,7 +106,7 @@
       this.running = false;
       this.debugout = $('#debugout');
       this.clockSpeedHz = 10;
-      this.statementCapacity = 5;
+      this.statementCapacity = 20;
       this.attachedOutputs = [];
       sandbox.__runner = this.__runner;
       sandbox.__thunk = __thunk;
