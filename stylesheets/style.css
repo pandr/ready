@@ -5,6 +5,11 @@ body {
   background-size: cover;
 }
 
+@media screen and (min-width: 1600px)
+{
+  body { zoom: 1.5; }
+}
+
 
 
 a {
