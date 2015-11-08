@@ -21,12 +21,10 @@
     'description': 'Write a program that prints the numbers from 1 to 100 (inclusive)',
     'outputChecker': function() {
       this.i = 0;
-      this.check = function(m) {
+      this.check = function(s, m) {
         this.i++;
-        return this.i <= 100 && (parseInt(m) == this.i); 
-      }
-      this.completed = function() {
-        return this.i == 100;
+        s.ok = parseInt(m) == this.i; 
+        s.done = this.i == 100;
       }
     }
   },
@@ -46,14 +44,12 @@
       this.i = 0;
       this.f = 1;
       this.p = 0;
-      this.check = function(m) {
+      this.check = function(s, m) {
         this.i++;
+        s.ok = parseInt(m) == this.f; 
+        s.done = this.i == 25;
         this.f = this.f + this.p;
         this.p = this.f - this.p;
-        return this.i <= 25 && (parseInt(m) == this.f); 
-      }
-      this.completed = function() {
-        return this.i == 25;
       }
     }
   },
@@ -63,11 +59,12 @@
     'description': 'Write a program that prints the multiplication table for 7; from 7 to 70.',
     'outputChecker': function() {
       this.i = 0;
-      this.check = function(m) {
+      this.check = function(s, m) {
         this.i++;
-        return this.i <= 10 && (parseInt(m) == this.i*7); 
+        s.ok = parseInt(m) == this.i*7; 
+        s.done = this.i == 10;
       }
-      this.completed = function() {
+      this.check_size = function() {
         return this.i == 10;
       }
     }

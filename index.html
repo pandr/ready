@@ -54,12 +54,13 @@
   <script src="main.js"></script>
 </head>
 <body>
-  <span id="helpButtonOpen" class="fa fa-question-circle helpButton"></span>
-  <span id="taskButtonOpen" class="fa fa-rocket helpButton taskButton"></span>
+  <!--<div class="overlay">
+    <div class="big">xyz</div>
+  </div>-->
   <div class="helpPane">
-    <h2>ready</h2>
-    <span id="helpButtonClose" class="helpButton fa fa-close helpButton"></span>
+    <span id="helpButtonClose" class="button fa fa-close helpButtonClose"></span>
     <div id="tasks">
+      <h2>Tasks</h2>
       <p>Complete some of these tasks to upgrade your computer!</p>
       <h3>Warm up [RAM unlock]</h3>
       <ul id="tasklist">
@@ -70,6 +71,7 @@
       <h3>..</h3>
     </div>
     <div id="help">
+    <h2>User manual</h2>
     <p>Congratulations with your new computer. We hope you enjoy it. Read this manual carefully and you will have many hours of fun.</p>
     <h3>Commands</h3>
     <dl class="helpdl">
@@ -99,12 +101,16 @@ clear();      // clear the screen
     </div>
   </div>
   <div id="container">
-  	<h1 id="title"><span id="title1">r</span>eady</h1>
+    <div id="header">
+  	  <h1 id="title"><span id="title1">r</span>eady</h1>
+      <span id="helpButtonOpen" class="button fa fa-question-circle helpButton"></span>
+      <span id="taskButtonOpen" class="button fa fa-rocket helpButton taskButton"></span>
+    </div>
   	<div id="left-col">
   		<div id="screen"></div>
       <div id="debugout" class="terminal"></div>
       <div id="stream0-container">
-        <div class="stream-caption">output checker</div>
+        <div id="stream0-caption" class="stream-caption output-checker-ok">output checker</div>
         <div id="stream0" class="terminal"></div>
       </div>
   	</div>
