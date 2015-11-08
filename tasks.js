@@ -16,7 +16,7 @@
     }
   },
   {
-    'id': 'numseq1',
+    'id': 'nseq1',
     'name': 'Number sequence',
     'description': 'Write a program that prints the numbers from 1 to 100 (inclusive)',
     'outputChecker': function() {
@@ -37,7 +37,7 @@
     }
   },
   {
-    'id': 'numseq2',
+    'id': 'nseq2',
     'name': 'Fibonacci',
     'description': 'The Fibonacci sequence is the numbers 1, 1, 2, 3, 5, 8, ... where each number is the sum of the two previous numbers. Write a program that prints the first 25 numbers from this sequence.',
     'outputChecker': function() {
