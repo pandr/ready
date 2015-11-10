@@ -108,6 +108,8 @@
       this.clockSpeedHz = 10;
       this.statementCapacity = 20;
       this.attachedOutputs = [];
+      this.attachedInputPos = 0;
+      this.attachedInput = undefined;
       sandbox.__runner = this.__runner;
       sandbox.__thunk = __thunk;
       sandbox.__machine = this;
@@ -125,9 +127,33 @@
       }
     }
 
+    Machine.prototype.read = function(stream)
+    {
+      //if(stream >= 0 && stream < this.attachedInputs.length)
+        //return this.attachedInputs[stream].next();
+      if(this.attachedInput === undefined)
+        return undefined;
+
+      if(this.attachedInputPos >= this.attachedInput.length)
+        return undefined; //eof
+
+      return this.attachedInput[this.attachedInputPos++];
+    }
+
     Machine.prototype.attachOutput = function(f)
     {
       this.attachedOutputs.push(f);
+    }
+
+    Machine.prototype.attachInput = function(f)
+    {
+      this.attachedInput = f;
+      this.attachedInputPos = 0;
+    }
+
+    Machine.prototype.detachInput = function()
+    {
+      this.attachedInput = undefined;
     }
 
     Machine.prototype.detachOutput = function(f)
@@ -194,8 +220,6 @@
     function create_machine(term)
     {
       var m = new Machine();
-      // Inject term
-      //m.contextwindow.term = term;
       m.attachOutput(function (m) { term.echo(m+''); });
       setupRuntime(m);
       return m;
@@ -204,24 +228,17 @@
     function Task(t)
     {
       this.task = t;
+      this.reset();
+    }
+
+    Task.prototype.reset = function()
+    {
       this.completed = false;
-    }
 
-    Task.prototype.getName = function()
-    {
-      return this.task.name;
-    }
+      var t = this.task;
 
-    Task.prototype.preRun = function(machine)
-    {
-      var task = this;
-      $('#stream0').html("");
-      $('#stream0-caption').removeClass("stream-checker-ok");
-      $('#stream0-caption').removeClass("stream-checker-failed");
-      $('#stream0-caption').addClass("stream-checker-pending");
-
-      if(task.task.outputChecker) {
-        this.checker = new task.task.outputChecker();
+      if(t.outputChecker) {
+        this.checker = new t.outputChecker();
       }
       else {
         // If no outputChecker defined, make a default from outputCheck
@@ -229,11 +246,49 @@
           this.i = 0;
           this.check = function(s, m) {
             this.i++;
-            s.ok = task.task.outputCheck(m);
+            s.ok = t.outputCheck(m);
             s.done = this.i == 1;
           }
         }
       }
+
+      this.data = undefined;
+      if(this.checker.populate !== undefined)
+      {
+        this.data = this.checker.populate();
+        if(this.data.stream1)
+        {
+          stream1.show();
+          stream1.clear();
+          for(var i = 0; i < this.data.stream1.length; i++)
+            $("#stream1").append('<span class="output_ok">'+this.data.stream1[i]+'</span>'+"\n");
+        }
+      }
+      else
+      {
+        stream1.hide();
+      }
+    }
+
+    Task.prototype.getName = function()
+    {
+      return this.task.name;
+    }
+
+    Task.prototype.getId = function()
+    {
+      return this.task.id;
+    }
+
+    Task.prototype.preRun = function(machine)
+    {
+      this.reset();
+      var task = this;
+      $('#stream0').html("");
+      $('#stream0-caption').removeClass("stream-checker-ok");
+      $('#stream0-caption').removeClass("stream-checker-failed");
+      $('#stream0-caption').addClass("stream-checker-pending");
+
       var checker = this.checker;
 
       this.status = { ok: false, done: false };
@@ -259,11 +314,16 @@
         s.scrollTop(s.prop("scrollHeight"));
       }
       machine.attachOutput(this.outputChecker);
+      if(this.data && this.data.stream1)
+      {
+        machine.attachInput(this.data.stream1);
+      }
     }
 
     Task.prototype.postRun = function(machine)
     {
       machine.detachOutput(this.outputChecker);
+      machine.detachInput();
       if(this.status.ok && this.status.done && !this.overflow)
       {
         $('#stream0-caption').addClass("stream-checker-ok");
@@ -348,7 +408,63 @@
 
     var taskdatabase = new TaskDatabase();
 
+    function Stream(name)
+    {
+      this.name = name;
+      this.container = $('#'+name+'-container');
+      this.caption = $('#'+name+'-caption');
+      this.box = $('#'+name);
+    }
+
+    Stream.prototype.show = function()
+    {
+      this.container.fadeIn().css("display","inline-block");
+    }
+
+    Stream.prototype.hide = function()
+    {
+      this.container.fadeOut();
+    }
+
+    Stream.prototype.clear = function()
+    {
+      this.box.html("");
+    }
+
+    Stream.prototype.caption_ok = function()
+    {
+      this.caption.removeClass("stream-checker-pending");
+      this.caption.removeClass("stream-checker-failed");
+      this.caption.addClass("stream-checker-ok");
+    }
+
+    Stream.prototype.caption_pending = function()
+    {
+      this.caption.removeClass("stream-checker-ok");
+      this.caption.removeClass("stream-checker-failed");
+      this.caption.addClass("stream-checker-pending");
+    }
+
+    Stream.prototype.caption_failed = function()
+    {
+      $('#stream0-caption').removeClass("stream-checker-pending");
+      $('#stream0-caption').removeClass("stream-checker-ok");
+      $('#stream0-caption').addClass("stream-checker-failed");
+    }
+
+    var stream0;
+    var stream1;
+    var stream2;
+
     function init() {
+
+      stream0 = new Stream('stream0');
+      stream1 = new Stream('stream1');
+      stream2 = new Stream('stream2');
+      stream0.hide();
+      stream1.hide();
+      stream2.hide();
+
       var editor = ace.edit("editor");
       editor.setTheme("ace/theme/twilight");
       editor.getSession().setMode("ace/mode/javascript");
@@ -397,14 +513,13 @@
           }
           else
           {
-            var task = new Task(current_task);
-            term.echo("[Testing: " + task.getName()+"]");
-            var preRun = function() { task.preRun(machine); };
+            term.echo("[Testing: " + current_task.getName()+"]");
+            var preRun = function() { current_task.preRun(machine); };
             var postRun = function() {
-              task.postRun(machine);
-              if(task.completed)
+              current_task.postRun(machine);
+              if(current_task.completed)
               {
-                set_task_solved(current_task.id);
+                set_task_solved(current_task.getId());
               }
             };
             run_program(preRun, postRun, debug);
@@ -479,7 +594,7 @@
           clear_task();
           return;
         }
-        current_task = task;
+        current_task = new Task(task);
 
         var program = taskdatabase.get_program(task_id);
         editor.getSession().setValue(program);
@@ -487,11 +602,9 @@
         $('#tasktitle').text(task.name);
         $('#taskdescription').text(task.description);
         $('.taskarea').addClass("taskareaVisible");
-        $('#stream0-container').fadeIn();
-        $('#stream0').html("");
-        $('#stream0-caption').addClass("stream-checker-ok");
-        $('#stream0-caption').removeClass("stream-checker-pending");
-        $('#stream0-caption').removeClass("stream-checker-failed");
+        stream0.show()
+        stream0.clear();
+        stream0.caption_ok();
         update_task_status(task_id);
       }
 
@@ -520,7 +633,9 @@
         $('#tasktitle').text("");
         $('#taskdescription').text("");
         $('.taskarea').removeClass("taskareaVisible");
-        $('#stream0-container').fadeOut();
+        stream0.hide();
+        stream1.hide();
+        stream2.hide();
       }
 
       function handle_input(command)
@@ -533,7 +648,7 @@
         var name = "default";
         if(current_task !== undefined)
         {
-          name = current_task.id;
+          name = current_task.getId();
         }
         taskdatabase.store_program(name, editor.getSession().getValue());
       }

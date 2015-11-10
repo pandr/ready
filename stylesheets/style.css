@@ -132,7 +132,17 @@ pre.prettyprint {
   display: none;
 }
 
-#stream0 {
+#stream1-container {
+  width: 200px;
+  display: inline-block;
+}
+
+#stream2-container {
+  width: 200px;
+  display: inline-block;
+}
+
+.stream-box {
   height: 50px;
   border: 1px solid #585;
   margin-top: 5px;

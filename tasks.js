@@ -64,9 +64,6 @@
         s.ok = parseInt(m) == this.i*7; 
         s.done = this.i == 10;
       }
-      this.check_size = function() {
-        return this.i == 10;
-      }
     }
   },
   {
@@ -85,6 +82,75 @@
       'Find the sum of all multiplies of 3 and 5 below 100.',
     'outputCheck': function(m) {
       return parseInt(m) == 2318;
+    }
+  },
+  {
+    'id': 'streammult',
+    'name': 'Data multiplier',
+    'description': 'Multiply the data from stream1 with 10 and output results.',
+    'outputChecker': function() {
+      this.i = 0;
+      this.stream1 = [];
+      this.check = function(s, m) {
+        s.ok = parseInt(m) == this.stream1[this.i] * 10;
+        s.done = this.i == this.stream1.length-1;
+        this.i++;
+      }
+      this.populate = function() {
+        this.stream1 = [];
+        for(var i = 0; i < 10; i++)
+          this.stream1.push(Math.floor(Math.random()*100));
+        return {stream1: this.stream1};
+      }
+    }
+  },
+  {
+    'id': 'streamcopy',
+    'name': 'Copy cat',
+    'description': 'Read data from input and write to output.',
+    'outputChecker': function() {
+      this.i = 0;
+      this.stream1 = [];
+      this.check = function(s, m) {
+        s.ok = parseInt(m) == this.stream1[this.i];
+        s.done = this.i == this.stream1.length-1;
+        this.i++;
+      }
+      this.populate = function() {
+        this.stream1 = [42,0];
+        var l = Math.floor(10+Math.random()*10);
+        for(var i = 0; i < l; i++)
+          this.stream1.push(Math.floor(Math.random()*1000));
+        return {stream1: this.stream1};
+      }
+    }
+  },
+  {
+    'id': 'streammax',
+    'name': 'Maximizer',
+    'description': 'Find and print the largest number from the input.',
+    'outputChecker': function() {
+      this.i = 0;
+      this.stream1 = [];
+      this.max = 0;
+      this.check = function(s, m) {
+        this.i++;
+        s.ok = parseInt(m) == this.max
+        s.done = this.i == 1
+      }
+      this.populate = function() {
+        this.stream1 = [];
+        var l = Math.floor(10+Math.random()*10);
+        for(var i = 0; i < l; i++)
+        {
+          var n = Math.floor(Math.random()*1000);
+          if(n > this.max) {
+            this.max = n;
+          }
+          this.stream1.push(n);
+        }
+        return {stream1: this.stream1};
+      }
     }
   },
 ];
