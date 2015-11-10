@@ -98,7 +98,8 @@ for(var i = 1; i < 10; i++)
     <h3>API</h3>
     <pre class="prettyprint">
 write(str);   // write string to screen
-read();       // read and return a line of text from user
+read();       // read a line of text from user
+read(0);      // read a line from input0
 clear();      // clear the screen
     </pre>
     </div>
@@ -117,11 +118,11 @@ clear();      // clear the screen
         <div id="stream0" class="stream-box terminal"></div>
       </div>
       <div id="stream1-container">
-        <div id="stream1-caption" class="stream-caption">data</div>
+        <div id="stream1-caption" class="stream-caption">input0</div>
         <div id="stream1" class="stream-box terminal"></div>
       </div>
       <div id="stream2-container">
-        <div id="stream2-caption" class="stream-caption">data</div>
+        <div id="stream2-caption" class="stream-caption">input1</div>
         <div id="stream2" class="stream-box terminal"></div>
       </div>
   	</div>
