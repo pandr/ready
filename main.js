@@ -137,6 +137,8 @@
       if(this.attachedInputPos >= this.attachedInput.length)
         return undefined; //eof
 
+      stream1.scroll_to_line(this.attachedInputPos);
+
       return this.attachedInput[this.attachedInputPos++];
     }
 
@@ -261,7 +263,7 @@
           stream1.show();
           stream1.clear();
           for(var i = 0; i < this.data.stream1.length; i++)
-            $("#stream1").append('<span class="output_ok">'+this.data.stream1[i]+'</span>'+"\n");
+            $("#stream1").append('<span>'+this.data.stream1[i]+'</span>'+"\n");
         }
       }
       else
@@ -284,10 +286,8 @@
     {
       this.reset();
       var task = this;
-      $('#stream0').html("");
-      $('#stream0-caption').removeClass("stream-checker-ok");
-      $('#stream0-caption').removeClass("stream-checker-failed");
-      $('#stream0-caption').addClass("stream-checker-pending");
+      stream0.clear();
+      stream0.caption_pending();
 
       var checker = this.checker;
 
@@ -305,13 +305,10 @@
           ok = false;
         }
         if(!ok) {
-          $('#stream0-caption').addClass("stream-checker-failed");
-          $('#stream0-caption').removeClass("stream-checker-pending");
-          $('#stream0-caption').removeClass("stream-checker-ok");
+          stream0.caption_failed();
         }
         $("#stream0").append('<span class="'+(ok ? 'output_ok' : 'output_not_ok')+'">'+m+'</span>'+"\n");
-        var s = $('#stream0');
-        s.scrollTop(s.prop("scrollHeight"));
+        stream0.scroll_to_bottom();
       }
       machine.attachOutput(this.outputChecker);
       if(this.data && this.data.stream1)
@@ -326,17 +323,13 @@
       machine.detachInput();
       if(this.status.ok && this.status.done && !this.overflow)
       {
-        $('#stream0-caption').addClass("stream-checker-ok");
-        $('#stream0-caption').removeClass("stream-checker-pending");
-        $('#stream0-caption').removeClass("stream-checker-failed");
+        stream0.caption_ok();
         this.completed = true;
         machine.echo("[Task completed!]");
       }
       else
       {
-        $('#stream0-caption').addClass("stream-checker-failed");
-        $('#stream0-caption').removeClass("stream-checker-pending");
-        $('#stream0-caption').removeClass("stream-checker-ok");
+        stream0.caption_failed();
         if(this.status.ok && this.overflow)
           machine.echo("[Task failed -- too much output]");
         else if (this.status.ok && !this.status.done)
@@ -447,9 +440,24 @@
 
     Stream.prototype.caption_failed = function()
     {
-      $('#stream0-caption').removeClass("stream-checker-pending");
-      $('#stream0-caption').removeClass("stream-checker-ok");
-      $('#stream0-caption').addClass("stream-checker-failed");
+      this.caption.removeClass("stream-checker-pending");
+      this.caption.removeClass("stream-checker-ok");
+      this.caption.addClass("stream-checker-failed");
+    }
+
+    Stream.prototype.scroll_to_bottom = function()
+    {
+      this.box.animate({scrollTop:(this.box.prop("scrollHeight"))});
+    }
+
+    Stream.prototype.scroll_to_line = function(l)
+    {
+      this.box.children().removeClass("current");
+      var scrollTo = this.box.children().eq(l);
+      scrollTo.addClass("current");
+      this.box.animate({scrollTop:(
+        scrollTo.offset().top - this.box.offset().top + this.box.scrollTop()
+      )});
     }
 
     var stream0;

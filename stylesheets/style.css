@@ -170,11 +170,11 @@ pre.prettyprint {
   background: #622;
 }
 
-#stream0 span.output_ok {
+.stream-box span {
   color: rgb(20,200,20);
   margin-left: 20px;
 }
-#stream0 span.output_ok:before {
+.stream-box span.output_ok:before {
   font-family: 'FontAwesome';
   content: '\f164';
   margin: 0 5px 0 -15px;
@@ -183,11 +183,12 @@ pre.prettyprint {
   width: 12px;
   color: #888;
 }
-#stream0 span.output_not_ok {
+
+.stream-box span.output_not_ok {
   color: rgb(20,200,20);
-  margin-left: 20px;
 }
-#stream0 span.output_not_ok:before {
+
+.stream-box span.output_not_ok:before {
   font-family: 'FontAwesome';
   content: '\f165';
   margin: 0 5px 0 -15px;
@@ -195,6 +196,16 @@ pre.prettyprint {
   font-size: 12px;
   width: 12px;
   color: #e22;
+}
+
+.stream-box span.current:before {
+  font-family: 'FontAwesome';
+  content: '\f178';
+  margin: 0 5px 0 -15px;
+  display: inline-block;
+  font-size: 12px;
+  width: 10px;
+  color: #888;
 }
 
 #screen {
