@@ -18,6 +18,26 @@ function newStep(loc)
 	return node;
 }
 
+function newFrame()
+{
+	var node = b.expressionStatement(
+		b.yieldExpression(
+			newObjectExpression({
+				type: 'frame',
+				evalinside: b.functionExpression(
+					null,
+					[b.identifier('e')],
+					b.blockStatement([
+						b.returnStatement(b.callExpression(b.identifier('eval'), [b.identifier('e')]))
+					]),
+					false
+				)
+			})
+		)
+	);
+	return node;
+}
+
 function newObjectExpression(obj)
 {
 	var props = [];
@@ -28,10 +48,17 @@ function newObjectExpression(obj)
 	return b.objectExpression(props);
 }
 
-function transform(source)
+function transform(source,insert_steps,force_return)
 {
+	if(typeof insert_steps == 'undefined')
+		insert_steps = true;
+	if(typeof force_return == 'undefined')
+		force_return = false;
+
 	var ast = recast.parse(source);
 	var statementcount = 0;
+
+	var last_thing = ast.program.body[ast.program.body.length-1];
 
 	recast.types.visit(ast, {
 	
@@ -48,6 +75,9 @@ function transform(source)
 		loopAfterBodyHelper: function(path) {
 
 			this.traverse(path);
+
+			if(!insert_steps)
+				return;
 
 			// Loop body. Insert step after
 			var body = path.get('body');
@@ -70,8 +100,18 @@ function transform(source)
 				return;
 
 			// Normal statement, insert step before 
+			var loc = path.node.loc;
+			if(force_return && path.node === last_thing && r_types.ExpressionStatement.check(path.node))
+			{
+				var rs = b.returnStatement(path.node.expression);
+				path.replace(rs);
+			}
+
+			if(!insert_steps)
+				return;
+
 			var bs = b.blockStatement(
-				[newStep(path.node.loc), path.node]);
+				[newStep(loc), path.node]);
 			path.replace(bs);
 		},
 
@@ -106,7 +146,8 @@ function transform(source)
 
 	ast.program = b.program([
 		b.functionDeclaration(
-			b.identifier('__top'), [], b.blockStatement(ast.program.body), true)
+			b.identifier('__top'), [], b.blockStatement([newFrame()].concat(ast.program.body)), true)
+			//b.identifier('__top'), [], b.blockStatement(ast.program.body), true)
 	]);
 
 	var res = {
@@ -120,4 +161,5 @@ function transform(source)
 
 module.exports = transform;
 
-window.transform = transform;
+if(typeof window !== 'undefined')
+	window.transform = transform;

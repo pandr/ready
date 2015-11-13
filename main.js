@@ -181,7 +181,7 @@
 
     Machine.prototype.step = function()
     {
-      this.debugout.text("stepcount: " + this.__runner.stepcount);
+      //this.debugout.text("stepcount: " + this.__runner.stepcount);
       if(!this.__runner.state.done && this.__runner.stepcount < 100000)
       {
         this.__runner.step();
@@ -197,7 +197,7 @@
       if(this.running)
       {
         clearInterval(this.intervalId);
-        this.onDone();
+        this.onDone(this.__runner.state.value);
       }
       this.running = false;
       this.echo("ready");
@@ -517,7 +517,7 @@
           {
             var preRun = function() {};
             var postRun = function() {};
-            run_program(preRun, postRun, debug);
+            run_program(editor.getSession().getValue(), preRun, postRun, debug);
           }
           else
           {
@@ -530,7 +530,7 @@
                 set_task_solved(current_task.getId());
               }
             };
-            run_program(preRun, postRun, debug);
+            run_program(editor.getSession().getValue(), preRun, postRun, debug);
           }
         }
         else if(command == 'reset')
@@ -549,22 +549,17 @@
         }
         else
         {
-          try {
-            var res = machine.context.evaluate(input);
-            term.echo(res+'');
-          }
-          catch(e) {
-            term.echo(e);
-          }
+          run_program(input, function(){}, function(v){ term.echo(v+''); }, false, true);
         }
       }
 
-      function run_program(preRun, postRun, debug)
+      function run_program(code, preRun, postRun, debug, isEval)
       {
-        var code = editor.getSession().getValue();
         var parsed = {};
         try {
-          var tcode = transform(code);
+          var insert_steps = true;
+          var force_return = isEval;
+          var tcode = transform(code, insert_steps, force_return);
           if(debug)
           {
             // Debug output
@@ -578,7 +573,7 @@
           else
           {
             machine.exec(tcode.code);
-            machine.run(function() { postRun(); term.set_prompt("> ");});
+            machine.run(function(v) { postRun(v); term.set_prompt("> ");});
             preRun(); // TODO: wire up input/output
             term.set_prompt("");
           }
