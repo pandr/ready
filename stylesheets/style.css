@@ -371,3 +371,7 @@ dl.helpdl dd {
   -webkit-transform: scale(1.5,1.5);
   -moz-transform: scale(1.5,1.5);
 }
+
+.ipMarker {
+  background: rgba(100,200,100,0.5);
+}

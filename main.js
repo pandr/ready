@@ -110,6 +110,8 @@
       this.attachedOutputs = [];
       this.attachedInputPos = 0;
       this.attachedInput = undefined;
+      this.onDone = undefined;
+      this.onStep = undefined;
       sandbox.__runner = this.__runner;
       sandbox.__thunk = __thunk;
       sandbox.__machine = this;
@@ -181,6 +183,12 @@
 
     Machine.prototype.step = function()
     {
+      if(this.onStep !== undefined && this.__runner.state.value && this.__runner.state.value.type == 'step')
+      {
+        var lstart = this.__runner.state.value.start.line;
+        var lend = this.__runner.state.value.end.line;
+        this.onStep(lstart, lend);
+      }
       //this.debugout.text("stepcount: " + this.__runner.stepcount);
       if(!this.__runner.state.done && this.__runner.stepcount < 100000)
       {
@@ -516,12 +524,21 @@
           if(current_task === undefined)
           {
             var preRun = function() {};
-            var postRun = function() {};
-            run_program(editor.getSession().getValue(), preRun, postRun, debug);
+            var lastIp = 0;
+            var postRun = function() {
+              editor.session.removeGutterDecoration(lastIp, "ipMarker");
+            };
+            var onStep = function(lstart, lend) {
+              editor.session.removeGutterDecoration(lastIp, "ipMarker");
+              editor.session.addGutterDecoration(lstart-1, "ipMarker");
+              lastIp = lstart-1;
+            };
+            run_program(editor.getSession().getValue(), preRun, postRun, onStep, debug, false);
           }
           else
           {
             term.echo("[Testing: " + current_task.getName()+"]");
+            var lastIp = 0;
             var preRun = function() { current_task.preRun(machine); };
             var postRun = function() {
               current_task.postRun(machine);
@@ -529,8 +546,14 @@
               {
                 set_task_solved(current_task.getId());
               }
+              editor.session.removeGutterDecoration(lastIp, "ipMarker");
             };
-            run_program(editor.getSession().getValue(), preRun, postRun, debug);
+            var onStep = function(lstart, lend) {
+              editor.session.removeGutterDecoration(lastIp, "ipMarker");
+              editor.session.addGutterDecoration(lstart-1, "ipMarker");
+              lastIp = lstart-1;
+            };
+            run_program(editor.getSession().getValue(), preRun, postRun, onStep, debug, false);
           }
         }
         else if(command == 'reset')
@@ -549,11 +572,11 @@
         }
         else
         {
-          run_program(input, function(){}, function(v){ term.echo(v+''); }, false, true);
+          run_program(input, function(){}, function(v){ term.echo(v+''); }, function(){}, false, true);
         }
       }
 
-      function run_program(code, preRun, postRun, debug, isEval)
+      function run_program(code, preRun, postRun, onStep, debug, isEval)
       {
         var parsed = {};
         try {
@@ -572,8 +595,9 @@
           }
           else
           {
+            machine.onStep = onStep;
             machine.exec(tcode.code);
-            machine.run(function(v) { postRun(v); term.set_prompt("> ");});
+            machine.run(function(v) { postRun(v); machine.onStep = undefined; term.set_prompt("> ");});
             preRun(); // TODO: wire up input/output
             term.set_prompt("");
           }
