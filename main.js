@@ -144,6 +144,14 @@
       return this.attachedInput[this.attachedInputPos++];
     }
 
+    Machine.prototype.eof = function(stream)
+    {
+      if(this.attachInput === undefined)
+        return true;
+
+      return this.attachedInputPos >= this.attachedInput.length;
+    }
+
     Machine.prototype.attachOutput = function(f)
     {
       this.attachedOutputs.push(f);
@@ -455,7 +463,7 @@
 
     Stream.prototype.scroll_to_bottom = function()
     {
-      this.box.animate({scrollTop:(this.box.prop("scrollHeight"))});
+      this.box.stop().animate({scrollTop:(this.box.prop("scrollHeight"))}, 'fast');
     }
 
     Stream.prototype.scroll_to_line = function(l)
@@ -463,9 +471,9 @@
       this.box.children().removeClass("current");
       var scrollTo = this.box.children().eq(l);
       scrollTo.addClass("current");
-      this.box.animate({scrollTop:(
+      this.box.stop().animate({scrollTop:(
         scrollTo.offset().top - this.box.offset().top + this.box.scrollTop()
-      )});
+      )}, 'fast');
     }
 
     var stream0;

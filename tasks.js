@@ -37,23 +37,6 @@
     }
   },
   {
-    'id': 'nseq2',
-    'name': 'Fibonacci',
-    'description': 'The Fibonacci sequence is the numbers 1, 1, 2, 3, 5, 8, ... where each number is the sum of the two previous numbers. Write a program that prints the first 25 numbers from this sequence.',
-    'outputChecker': function() {
-      this.i = 0;
-      this.f = 1;
-      this.p = 0;
-      this.check = function(s, m) {
-        this.i++;
-        s.ok = parseInt(m) == this.f; 
-        s.done = this.i == 25;
-        this.f = this.f + this.p;
-        this.p = this.f - this.p;
-      }
-    }
-  },
-  {
     'id': 'multtab',
     'name': 'Multiplication table',
     'description': 'Write a program that prints the multiplication table for 7; from 7 to 70.',
@@ -76,12 +59,24 @@
     }
   },
   {
-    'id': 'euler1',
-    'name': 'Do math IV (Euler 1)',
-    'description': 'If we list all the natural numbers below 10 that are multiples of 3 or 5, we get 3, 5, 6 and 9. The sum of these multiples is 23.'+
-      'Find the sum of all multiplies of 3 and 5 below 100.',
-    'outputCheck': function(m) {
-      return parseInt(m) == 2318;
+    'id': 'streamcopy',
+    'name': 'Copy cat',
+    'description': 'Read data from input and write to output.',
+    'outputChecker': function() {
+      this.i = 0;
+      this.stream1 = [];
+      this.check = function(s, m) {
+        s.ok = parseInt(m) == this.stream1[this.i];
+        s.done = this.i == this.stream1.length-1;
+        this.i++;
+      }
+      this.populate = function() {
+        this.stream1 = [42,0];
+        var l = Math.floor(10+Math.random()*10);
+        for(var i = 0; i < l; i++)
+          this.stream1.push(Math.floor(Math.random()*1000));
+        return {stream1: this.stream1};
+      }
     }
   },
   {
@@ -105,23 +100,19 @@
     }
   },
   {
-    'id': 'streamcopy',
-    'name': 'Copy cat',
-    'description': 'Read data from input and write to output.',
+    'id': 'nseq2',
+    'name': 'Fibonacci',
+    'description': 'The Fibonacci sequence is the numbers 1, 1, 2, 3, 5, 8, ... where each number is the sum of the two previous numbers. Write a program that prints the first 25 numbers from this sequence.',
     'outputChecker': function() {
       this.i = 0;
-      this.stream1 = [];
+      this.f = 1;
+      this.p = 0;
       this.check = function(s, m) {
-        s.ok = parseInt(m) == this.stream1[this.i];
-        s.done = this.i == this.stream1.length-1;
         this.i++;
-      }
-      this.populate = function() {
-        this.stream1 = [42,0];
-        var l = Math.floor(10+Math.random()*10);
-        for(var i = 0; i < l; i++)
-          this.stream1.push(Math.floor(Math.random()*1000));
-        return {stream1: this.stream1};
+        s.ok = parseInt(m) == this.f; 
+        s.done = this.i == 25;
+        this.f = this.f + this.p;
+        this.p = this.f - this.p;
       }
     }
   },
@@ -151,6 +142,15 @@
         }
         return {stream1: this.stream1};
       }
+    }
+  },
+  {
+    'id': 'euler1',
+    'name': 'Do math IV (Euler 1)',
+    'description': 'If we list all the natural numbers below 10 that are multiples of 3 or 5, we get 3, 5, 6 and 9. The sum of these multiples is 23.'+
+      'Find the sum of all multiplies of 3 and 5 below 100.',
+    'outputCheck': function(m) {
+      return parseInt(m) == 2318;
     }
   },
 ];

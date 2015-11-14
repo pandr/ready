@@ -30,7 +30,12 @@
     return _input_queue.shift();
   }
 
-  function* write(msg)
+  function eof(stream)
+  {
+    return __machine.eof(stream);
+  }
+
+  function write(msg)
   {
     __machine.echo(msg);
   }
