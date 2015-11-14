@@ -108,8 +108,7 @@
       this.clockSpeedHz = 10;
       this.statementCapacity = 20;
       this.attachedOutputs = [];
-      this.attachedInputPos = 0;
-      this.attachedInput = undefined;
+      this.attachedInputs = {};
       this.onDone = undefined;
       this.onStep = undefined;
       sandbox.__runner = this.__runner;
@@ -131,25 +130,25 @@
 
     Machine.prototype.read = function(stream)
     {
-      //if(stream >= 0 && stream < this.attachedInputs.length)
-        //return this.attachedInputs[stream].next();
-      if(this.attachedInput === undefined)
+      var s = this.attachedInputs[stream];
+      if(s === undefined)
         return undefined;
 
-      if(this.attachedInputPos >= this.attachedInput.length)
+      if(s.pos >= s.data.length)
         return undefined; //eof
 
-      stream1.scroll_to_line(this.attachedInputPos);
+      s.ui.scroll_to_line(s.pos);
 
-      return this.attachedInput[this.attachedInputPos++];
+      return s.data[s.pos++];
     }
 
     Machine.prototype.eof = function(stream)
     {
-      if(this.attachInput === undefined)
+      var s = this.attachedInputs[stream];
+      if(s === undefined)
         return true;
 
-      return this.attachedInputPos >= this.attachedInput.length;
+      return s.pos >= s.data.length;
     }
 
     Machine.prototype.attachOutput = function(f)
@@ -157,15 +156,19 @@
       this.attachedOutputs.push(f);
     }
 
-    Machine.prototype.attachInput = function(f)
+    Machine.prototype.attachInput = function(idx, data, stream_ui)
     {
-      this.attachedInput = f;
-      this.attachedInputPos = 0;
+      var s = {
+        data: data,
+        pos: 0,
+        ui: stream_ui
+      }
+      this.attachedInputs[idx] = s;
     }
 
-    Machine.prototype.detachInput = function()
+    Machine.prototype.detachInput = function(idx)
     {
-      this.attachedInput = undefined;
+      delete this.attachedInputs[idx];
     }
 
     Machine.prototype.detachOutput = function(f)
@@ -329,14 +332,14 @@
       machine.attachOutput(this.outputChecker);
       if(this.data && this.data.stream1)
       {
-        machine.attachInput(this.data.stream1);
+        machine.attachInput(1, this.data.stream1, stream1);
       }
     }
 
     Task.prototype.postRun = function(machine)
     {
       machine.detachOutput(this.outputChecker);
-      machine.detachInput();
+      machine.detachInput(1);
       if(this.status.ok && this.status.done && !this.overflow)
       {
         stream0.caption_ok();

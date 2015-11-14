@@ -18,11 +18,9 @@
 
   var _input_queue = [];
 
-  function* read(stream)
+  function* read()
   {
-    if(stream != undefined)
-      return __machine.read(stream);
-
+    // Blocking read from stdin. TODO move to machine, perhaps
     while(_input_queue.length == 0)
     {
       yield 0;
@@ -30,9 +28,14 @@
     return _input_queue.shift();
   }
 
-  function eof(stream)
+  function eof(id)
   {
-    return __machine.eof(stream);
+    return __machine.eof(id);
+  }
+
+  function readfile(id)
+  {
+    return __machine.read(id);
   }
 
   function write(msg)
@@ -104,7 +107,8 @@ for(var i = 1; i < 10; i++)
     <pre class="prettyprint">
 write(str);   // write string to screen
 read();       // read a line of text from user
-read(0);      // read a line from input0
+readfile(1);  // read a line from file #1
+eof(1);       // checks if file #1 is at end
 clear();      // clear the screen
     </pre>
     </div>
@@ -123,11 +127,11 @@ clear();      // clear the screen
         <div id="stream0" class="stream-box terminal"></div>
       </div>
       <div id="stream1-container">
-        <div id="stream1-caption" class="stream-caption">input0</div>
+        <div id="stream1-caption" class="stream-caption">file1</div>
         <div id="stream1" class="stream-box terminal"></div>
       </div>
       <div id="stream2-container">
-        <div id="stream2-caption" class="stream-caption">input1</div>
+        <div id="stream2-caption" class="stream-caption">file2</div>
         <div id="stream2" class="stream-box terminal"></div>
       </div>
   	</div>

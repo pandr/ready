@@ -1,4 +1,11 @@
 [
+/*
+  {
+    type: 'section',
+    name: 'Warm up'   
+    content: ['hello', 'simplemathmul', 'nseq1', 'sumlt100']
+  }
+  */
   {
     'id': 'hello',
     'name': 'Say hello',
