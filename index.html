@@ -54,7 +54,7 @@
   }
 
   __machine.echo("Welcome to Ready, 1.0");
-  __machine.echo("RAM: " + __machine.statementCapacity + "   CPU: " + __machine.clockSpeedHz + "hz    GPU: n/a     SND: n/a      GFX: n/a");
+  __machine.echo("RAM: " + __machine.config.statementCapacity + "   CPU: " + __machine.config.clockSpeedHz + "hz    GPU: n/a     SND: n/a      GFX: n/a");
   __machine.echo("Have fun!");
   __machine.echo("");
   __machine.echo("ready");
@@ -73,13 +73,8 @@
     <div id="tasks">
       <h2>Tasks</h2>
       <p>Complete some of these tasks to upgrade your computer!</p>
-      <h3>Warm up [RAM unlock]</h3>
-      <ul id="tasklist">
-      </ul>
-      <h3>Number cruncher [CPU unlock]</h3>
-      <h3>Algorithm 101 [.. unlock]</h3>
-      <h3>String parties [.. unlock]</h3>
-      <h3>..</h3>
+      <div id="tasksections">
+      </div>
     </div>
     <div id="help">
     <h2>User manual</h2>

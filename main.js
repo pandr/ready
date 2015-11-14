@@ -100,13 +100,15 @@
       }
     };
  
-    function Machine() {
+    function Machine(config) {
       var sandbox = {};
       this.__runner = new Runner(); 
       this.running = false;
       this.debugout = $('#debugout');
-      this.clockSpeedHz = 10;
-      this.statementCapacity = 20;
+      this.config = {
+        clockSpeedHz: 10,
+        statementCapacity: 20,
+      }
       this.attachedOutputs = [];
       this.attachedInputs = {};
       this.onDone = undefined;
@@ -117,6 +119,12 @@
       sandbox.setTimeout = this.setTimeout.bind(this);
       this.context = new Context(sandbox);
       this.contextwindow = this.context.iframe.contentWindow;
+
+      // Transfer config verrides
+      for(var c in config)
+      {
+        this.config[c] = config[c];
+      }
     }
 
     Machine.prototype.echo = function(msg)
@@ -226,7 +234,7 @@
     Machine.prototype.run = function(onDone)
     {
       this.onDone = onDone;
-      var interval = 1000 / this.clockSpeedHz;
+      var interval = 1000 / this.config.clockSpeedHz;
       this.intervalId = setInterval(this.step.bind(this), interval);
       this.running = true;
     }
@@ -240,7 +248,7 @@
 
     function create_machine(term)
     {
-      var m = new Machine();
+      var m = new Machine(taskdatabase.unlocked_config);
       m.attachOutput(function (m) { term.echo(m+''); });
       setupRuntime(m);
       return m;
@@ -261,7 +269,7 @@
       if(t.outputChecker) {
         this.checker = new t.outputChecker();
       }
-      else {
+      else if (t.outputCheck) {
         // If no outputChecker defined, make a default from outputCheck
         this.checker = new function() {
           this.i = 0;
@@ -272,9 +280,19 @@
           }
         }
       }
+      else {
+        // Always succeed
+        this.checker = new function() {
+          this.allow_overflow = true;
+          this.check = function(s,m) {
+            s.ok = true;
+            s.done = true;
+          }
+        }
+      }
 
       this.data = undefined;
-      if(this.checker.populate !== undefined)
+      if(this.checker.populate)
       {
         this.data = this.checker.populate();
         if(this.data.stream1)
@@ -319,6 +337,9 @@
           checker.check(task.status, m);
           ok = task.status.ok;
         }
+        else if(checker.allow_overflow) {
+          ok = true;
+        }
         else {
           task.overflow = true;
           ok = false;
@@ -361,16 +382,50 @@
     function TaskDatabase()
     {
       this._load();
-      this.tasks = [];
+      this.tasks = {};
+      this.tasksections = [];
+      this.unlocked_config = {};
       var t = this;
       $.get("tasks.js", function(data) {
-        t.add_tasks(eval(data));
+        t.tasks = eval(data)[0];
+        for(var i in t.tasks)
+        {
+          t.tasks[i].id = i;
+        }
+      });
+      $.get("tasksections.js", function(data) {
+        t.tasksections = eval(data);
+        t.unlock_rewards();
       });
     }
 
-    TaskDatabase.prototype.add_tasks = function(tasks)
+    TaskDatabase.prototype.unlock_rewards = function()
     {
-      this.tasks = this.tasks.concat(tasks);
+      for(var i = 0; i < this.tasksections.length; i++)
+      {
+        var sect = this.tasksections[i];
+        var completed = true;
+        for(var j = 0; j < sect.tasks.length; j++)
+        {
+          var id = sect.tasks[j];
+          if (!this.is_solved(id))
+          {
+            completed = false;
+          }
+        }
+        if(!completed)
+          continue;
+        // Section was completed, so unlock any unlocks
+        if(sect.unlock)
+        {
+          for(var v in sect.unlock)
+          {
+            if(sect.unlock[v] < this.unlocked_config[v])
+              continue;
+            this.unlocked_config[v] = sect.unlock[v];
+          }
+        } 
+      } 
     }
 
     TaskDatabase.prototype._load = function()
@@ -395,6 +450,7 @@
     {
       this.storage.solved_tasks[task_id] = 1;
       this._save();
+      this.unlock_rewards();
     }
 
     TaskDatabase.prototype.store_program = function(name, program)
@@ -410,12 +466,7 @@
 
     TaskDatabase.prototype.find_task = function(task_id)
     {
-      for(var i = 0; i < this.tasks.length; i++)
-      {
-        if(this.tasks[i].id == task_id)
-          return this.tasks[i];
-      }
-      return undefined;
+      return this.tasks[task_id];
     }
 
     var taskdatabase = new TaskDatabase();
@@ -600,7 +651,7 @@
             term.echo(tcode.code);
             term.echo("Statements: " + tcode.stats.statementcount);
           }
-          if(tcode.stats.statementcount > machine.statementCapacity)
+          if(tcode.stats.statementcount > machine.config.statementCapacity)
           {
             term.echo("Error: program too big: " + tcode.stats.statementcount + " statements");
           }
@@ -622,7 +673,6 @@
       {
         taskdatabase.set_solved(task_id);
         update_task_status(task_id);
-        //$('#taskstatus').
       }
 
       function set_task(task_id)
@@ -632,9 +682,18 @@
           clear_task();
           return;
         }
+
+        if(machine.running)
+          machine.stop();
+        
         current_task = new Task(task);
 
-        var program = taskdatabase.get_program(task_id);
+        var program = current_task.task.source;
+
+        if(program === undefined)
+        {
+          program = taskdatabase.get_program(task_id);
+        }
         editor.getSession().setValue(program);
 
         $('#tasktitle').text(task.name);
@@ -717,13 +776,25 @@
         }
       };
 
-      var tasks = taskdatabase.tasks;
-      for(var i = 0; i < tasks.length; i++)
+      var ts = taskdatabase.tasksections;
+      for(var i = 0; i < ts.length; i++)
       {
-        var id = tasks[i].id;
-        var nav = $('#tasklist').append('<li data-id="'+id+'">'+ tasks[i].name +'</li>');
+        var sec = $('<div class="tasksection"></div>').appendTo($('#tasksections'));
+        sec.append('<h3>'+ts[i].title+' (<span class="completion"></span>)</h3>');
+        sec.append('<span class="taskprogress taskprogress_solved"></span><span class="taskprogress taskprogress_remaining"></span>');
+        if(ts[i].reward)
+          sec.append('<span class="reward">'+ts[i].reward+'</span>');
+        sec.append('<p>'+ts[i].description+'</p>');
+        var list = $('<ul class="tasklist"></ul>').appendTo(sec);
+        var tasks = ts[i].tasks;
+        for(var j = 0; j < tasks.length; j++)
+        {
+          var task = taskdatabase.find_task(tasks[j]);
+          var nav = list.append('<li data-id="'+task.id+'">'+ task.name +'</li>');
+        }
       }
-      $('#tasklist > li').click(function() {
+
+      $('.tasksection > ul > li').click(function() {
         set_task($(this).data("id"));
         $('.helpPane').removeClass("helpPaneVisible");
       });
@@ -740,20 +811,32 @@
     {
       $('#helpButtonOpen').click(function(){
         $('.helpPane').addClass("helpPaneVisible");
-        $('.helpPane div').hide();
+        $('.helpPane > div').hide();
         $('.helpPane #help').show();
       });
 
       $('#taskButtonOpen').click(function(){
         $('.helpPane').addClass("helpPaneVisible");
-        $('.helpPane div').hide();
+        $('.helpPane > div').hide();
         $('.helpPane #tasks').show();
-        $('#tasklist > li').each(function(i) {
-          var id = $(this).data("id");
-          if(taskdatabase.is_solved(id))
-            $(this).addClass("solved");
-          else
-            $(this).removeClass("solved");
+        $('.tasklist > li').each(function(i) {
+        });
+        $('.tasksection').each(function(i) {
+          var total = 0;
+          var solved = 0;
+          $(this).find('.tasklist > li').each(function(j) {
+            var id = $(this).data("id");
+            total++;
+            if(taskdatabase.is_solved(id)) {
+              $(this).addClass("solved");
+              solved++;
+            }
+            else
+              $(this).removeClass("solved");
+          })
+          $(this).find('.completion').html(solved+"/"+total);
+          $(this).find('.taskprogress_solved').css('width',(50*solved/total)+"px");
+          $(this).find('.taskprogress_remaining').css('width',(50*(total-solved)/total)+"px");
         });
       });
 
