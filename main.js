@@ -1,4 +1,17 @@
 
+    function random(min,max)
+    {
+      return min + Math.floor(Math.random()*(max-min+1));
+    }
+
+    function randomlist(min,max,count)
+    {
+      var res = [];
+      for(var i = 0; i < count; i++)
+        res.push(random(min,max));
+      return res;
+    }
+
     var sandbox = {};
 
     function Thunk(func, thisp, args)
@@ -392,10 +405,14 @@
         {
           t.tasks[i].id = i;
         }
+      }).fail( function(d, textStatus, error) {
+        console.error("get failed, status: " + textStatus + ", error: "+error)
       });
       $.get("tasksections.js", function(data) {
         t.tasksections = eval(data);
         t.unlock_rewards();
+      }).fail( function(d, textStatus, error) {
+        console.error("get failed, status: " + textStatus + ", error: "+error)
       });
     }
 

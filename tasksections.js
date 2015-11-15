@@ -8,7 +8,12 @@
 		title: 'Your first upgrade!',
 		description: 'Complete these tasks to earn your first upgrade: a faster CPU!',
 		tasks: ['multtab','sum7mult','streamcopy','streammult','streammax'],
-		reward: 'CPU: 100 Hz',
-		unlock: {clockSpeedHz: 100}	
+		reward: 'CPU: 30 Hz',
+		unlock: {clockSpeedHz: 30}	
+	},
+	{
+		title: 'Streams of fun!',
+		description: 'Complete these ',
+		tasks: ['streamoddeven','streamevenfinder'],
 	},
 ]

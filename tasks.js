@@ -165,4 +165,49 @@
       return parseInt(m) == 2318;
     }
   },
+  'streamoddeven':
+  {
+    'name': 'Odd or even',
+    'description': 'Read the input and print "Even" or "Odd" for each number.',
+    'outputChecker': function() {
+      this.i = 0;
+      this.stream1 = [];
+      this.check = function(s, m) {
+        var ans = (this.stream1[this.i]&1) ? "odd" : "even";
+        s.ok = (ans == m.toLowerCase());
+        this.i++;
+        s.done = this.i == this.stream1.length;
+      }
+      this.populate = function() {
+        this.stream1 = randomlist(0,1000,random(20,30));
+        return {stream1: this.stream1};
+      }
+    }
+  },
+  'streamevenfinder':
+  {
+    'name': 'Odd ones out',
+    'description': 'Read all of the input but print only the even numbers out',
+    'outputChecker': function() {
+      this.i = 0;
+      this.stream1 = [];
+      this.answer = [];
+      this.check = function(s, m) {
+        s.ok = (parseInt(m) == this.answer[this.i]);
+        this.i++;
+        s.done = this.i == this.answer.length;
+      }
+      this.populate = function() {
+        this.stream1 = randomlist(0,1000,random(20,30));
+        for(var i = 0; i < this.stream1.length; i++)
+        {
+          var n = this.stream1[i];
+          if(n&1)
+            continue;
+          this.answer.push(n);
+        }
+        return {stream1: this.stream1};
+      }
+    }
+  },
 }];
