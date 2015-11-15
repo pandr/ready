@@ -14,7 +14,7 @@
   'hello':
   {
     'name': 'Say hello',
-    'description': 'Write a program that prints "Hello, World" on the screen',
+    'description': 'Write a program that write "Hello, World" on the screen',
     'outputCheck': function(m) {
       return (/^hello, world/i).test(m);
     }
@@ -22,7 +22,7 @@
   'simplemathmul':
   {
     'name': 'Do math I',
-    'description': 'Write a program that prints the result of 1379 * 7728',
+    'description': 'Write a program that write the result of 1379 * 7728',
     'outputCheck': function(m) {
       return parseInt(m) == 1379*7728;
     }
@@ -30,7 +30,7 @@
   'nseq1':
   {
     'name': 'Number sequence',
-    'description': 'Write a program that prints the numbers from 1 to 100 (inclusive)',
+    'description': 'Write a program that write the numbers from 1 to 100 (inclusive)',
     'outputChecker': function() {
       this.i = 0;
       this.check = function(s, m) {
@@ -43,15 +43,31 @@
   'sumlt100':
   {
     'name': 'Do math II',
-    'description': 'Print the sum of all numbers less than 100. So you must calculate 1 + 2 + ... + 99',
+    'description': 'Write the sum of all numbers less than 100. So you must calculate 1 + 2 + ... + 99',
     'outputCheck': function(m) {
       return parseInt(m) == 4950;
+    }
+  },
+  'nseq3':
+  {
+    'name': 'Back and forth',
+    'description': 'A sequence starts like this: 1, 5, 4, 8, 7, 11, ... You start by 1 and add 4, then subtract 1, '+
+      'then add 4, then substract 1, and so on. Write the first 100 numbers from this sequence',
+    'outputChecker': function() {
+      this.i = 0;
+      this.val = 1;
+      this.check = function (s,m) {
+        this.i++;
+        s.ok = parseInt(m) == this.val;
+        s.done = this.i == 100;
+        this.val += (this.i&1) ? 4 : -1;
+      }
     }
   },
   'multtab':
   {
     'name': 'Multiplication table',
-    'description': 'Write a program that prints the multiplication table for 7; from 7 to 70.',
+    'description': 'Write a program that write the multiplication table for 7; from 7 to 70.',
     'outputChecker': function() {
       this.i = 0;
       this.check = function(s, m) {
@@ -114,7 +130,7 @@
   'nseq2':
   {
     'name': 'Fibonacci',
-    'description': 'The Fibonacci sequence is the numbers 1, 1, 2, 3, 5, 8, ... where each number is the sum of the two previous numbers. Write a program that prints the first 25 numbers from this sequence.',
+    'description': 'The Fibonacci sequence is the numbers 1, 1, 2, 3, 5, 8, ... where each number is the sum of the two previous numbers. Write a program that write the first 25 numbers from this sequence.',
     'outputChecker': function() {
       this.i = 0;
       this.f = 1;
@@ -131,7 +147,7 @@
   'streammax':
   {
     'name': 'Maximizer',
-    'description': 'Find and print the largest number from the input.',
+    'description': 'Find and write the largest number from the input.',
     'outputChecker': function() {
       this.i = 0;
       this.stream1 = [];
@@ -168,7 +184,7 @@
   'streamoddeven':
   {
     'name': 'Odd or even',
-    'description': 'Read the input and print "Even" or "Odd" for each number.',
+    'description': 'Read the input and write "Even" or "Odd" for each number.',
     'outputChecker': function() {
       this.i = 0;
       this.stream1 = [];
@@ -187,7 +203,7 @@
   'streamevenfinder':
   {
     'name': 'Odd ones out',
-    'description': 'Read all of the input but print only the even numbers out',
+    'description': 'Read all of the input but write only the even numbers out',
     'outputChecker': function() {
       this.i = 0;
       this.stream1 = [];
@@ -206,6 +222,28 @@
             continue;
           this.answer.push(n);
         }
+        return {stream1: this.stream1};
+      }
+    }
+  },
+  'streampivot':
+  {
+    'name': 'First is the judge',
+    'description': 'Read the first number from input. Then read the rest of the numbers and compare them to the first. '+
+      'Write "bigger" or "smaller" or "same" for each number.',
+    'outputChecker': function() {
+      this.i = 0;
+      this.stream1 = [];
+      this.check = function(s, m) {
+        this.i++;
+        var first = this.stream1[0];
+        var n = this.stream1[this.i];
+        var res = n > first ? "bigger" : n < first ? "smaller" : "same";
+        s.ok = (m.toLowerCase() == res);
+        s.done = this.i == this.stream1.length-1;
+      }
+      this.populate = function() {
+        this.stream1 = randomlist(0,1000,random(20,30));
         return {stream1: this.stream1};
       }
     }
