@@ -267,9 +267,10 @@
       return m;
     }
 
-    function Task(t)
+    function Task(t, machine)
     {
       this.task = t;
+      this.machine = machine;
       this.reset();
     }
 
@@ -315,6 +316,10 @@
           for(var i = 0; i < this.data.stream1.length; i++)
             $("#stream1").append('<span>'+this.data.stream1[i]+'</span>'+"\n");
         }
+        if(this.data.stream1)
+        {
+          this.machine.attachInput(1, this.data.stream1, stream1);
+        }
       }
       else
       {
@@ -332,7 +337,7 @@
       return this.task.id;
     }
 
-    Task.prototype.preRun = function(machine)
+    Task.prototype.preRun = function()
     {
       this.reset();
       var task = this;
@@ -363,32 +368,28 @@
         $("#stream0").append('<span class="'+(ok ? 'output_ok' : 'output_not_ok')+'">'+m+'</span>'+"\n");
         stream0.scroll_to_bottom();
       }
-      machine.attachOutput(this.outputChecker);
-      if(this.data && this.data.stream1)
-      {
-        machine.attachInput(1, this.data.stream1, stream1);
-      }
+      this.machine.attachOutput(this.outputChecker);
     }
 
-    Task.prototype.postRun = function(machine)
+    Task.prototype.postRun = function()
     {
-      machine.detachOutput(this.outputChecker);
-      machine.detachInput(1);
+      this.machine.detachOutput(this.outputChecker);
+      this.machine.detachInput(1);
       if(this.status.ok && this.status.done && !this.overflow)
       {
         stream0.caption_ok();
         this.completed = true;
-        machine.echo("[Task completed!]");
+        this.machine.echo("[Task completed!]");
       }
       else
       {
         stream0.caption_failed();
         if(this.status.ok && this.overflow)
-          machine.echo("[Task failed -- too much output]");
+          this.machine.echo("[Task failed -- too much output]");
         else if (this.status.ok && !this.status.done)
-          machine.echo("[Task failed -- not enough output]");
+          this.machine.echo("[Task failed -- not enough output]");
         else
-          machine.echo("[Task failed -- error in output]");
+          this.machine.echo("[Task failed -- error in output]");
       }
     }
 
@@ -618,9 +619,9 @@
           {
             term.echo("[Testing: " + current_task.getName()+"]");
             var lastIp = 0;
-            var preRun = function() { current_task.preRun(machine); };
+            var preRun = function() { current_task.preRun(); };
             var postRun = function() {
-              current_task.postRun(machine);
+              current_task.postRun();
               if(current_task.completed)
               {
                 set_task_solved(current_task.getId());
@@ -703,7 +704,7 @@
         if(machine.running)
           machine.stop();
         
-        current_task = new Task(task);
+        current_task = new Task(task, machine);
 
         var program = current_task.task.source;
 
