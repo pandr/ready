@@ -296,17 +296,28 @@
       }
       else {
         // Always succeed
-        this.checker = new function() {
+        this.checker = null;/*new function() {
           this.allow_overflow = true;
           this.check = function(s,m) {
             s.ok = true;
             s.done = true;
           }
         }
+        */
+      }
+      if(this.checker != null)
+      {
+        stream0.show()
+        stream0.clear();
+        stream0.caption_ok();
+      }
+      else
+      {
+        stream0.hide();
       }
 
       this.data = undefined;
-      if(this.checker.populate)
+      if(this.checker && this.checker.populate)
       {
         this.data = this.checker.populate();
         if(this.data.stream1)
@@ -340,7 +351,9 @@
     Task.prototype.preRun = function()
     {
       this.reset();
+
       var task = this;
+
       stream0.clear();
       stream0.caption_pending();
 
@@ -349,47 +362,64 @@
       this.status = { ok: false, done: false };
       this.overflow = false;
 
-      this.outputChecker = function (m) {
-        var ok;
-        if(!task.status.done) {
-          checker.check(task.status, m);
-          ok = task.status.ok;
-        }
-        else if(checker.allow_overflow) {
-          ok = true;
-        }
-        else {
-          task.overflow = true;
-          ok = false;
-        }
-        if(!ok) {
-          stream0.caption_failed();
-        }
-        $("#stream0").append('<span class="'+(ok ? 'output_ok' : 'output_not_ok')+'">'+m+'</span>'+"\n");
-        stream0.scroll_to_bottom();
+      if(!checker)
+      {
+        this.status.ok = true;
+        this.status.done = true;
       }
-      this.machine.attachOutput(this.outputChecker);
+      else
+      {
+        //this.machine.echo("[Testing: " + this.getName()+"]");
+        this.outputChecker = function (m) {
+          var ok;
+          if(!task.status.done) {
+            checker.check(task.status, m);
+            ok = task.status.ok;
+          }
+          else if(checker.allow_overflow) {
+            ok = true;
+          }
+          else {
+            task.overflow = true;
+            ok = false;
+          }
+          if(!ok) {
+            stream0.caption_failed();
+          }
+          $("#stream0").append('<span class="'+(ok ? 'output_ok' : 'output_not_ok')+'">'+m+'</span>'+"\n");
+          stream0.scroll_to_bottom();
+        }
+        this.machine.attachOutput(this.outputChecker);
+      }
     }
 
     Task.prototype.postRun = function()
     {
-      this.machine.detachOutput(this.outputChecker);
       this.machine.detachInput(1);
+
+      if(!this.outputChecker)
+      {
+        this.completed = true;
+        return;
+      }
+
+      this.machine.detachOutput(this.outputChecker);
+
       if(this.status.ok && this.status.done && !this.overflow)
       {
         stream0.caption_ok();
         this.completed = true;
-        this.machine.echo("[Task completed!]");
+        this.machine.echo("[[;#0f0;]Task completed!]");
       }
       else
       {
         stream0.caption_failed();
         if(this.status.ok && this.overflow)
-          this.machine.echo("[Task failed -- too much output]");
+          this.machine.echo("[[;red;]Task failed -- too much output]");
         else if (this.status.ok && !this.status.done)
-          this.machine.echo("[Task failed -- not enough output]");
+          this.machine.echo("[[;red;]Task failed -- not enough output]");
         else
-          this.machine.echo("[Task failed -- error in output]");
+          this.machine.echo("[[;red;]Task failed -- error in output]");
       }
     }
 
@@ -422,17 +452,18 @@
       for(var i = 0; i < this.tasksections.length; i++)
       {
         var sect = this.tasksections[i];
-        var completed = true;
+        sect.completed = true;
         for(var j = 0; j < sect.tasks.length; j++)
         {
           var id = sect.tasks[j];
           if (!this.is_solved(id))
           {
-            completed = false;
+            sect.completed = false;
           }
         }
-        if(!completed)
+        if(!sect.completed)
           continue;
+
         // Section was completed, so unlock any unlocks
         if(sect.unlock)
         {
@@ -464,11 +495,35 @@
       return this.storage.solved_tasks[task_id] == 1;
     }
 
+    TaskDatabase.prototype.find_tasksection = function(task_id)
+    {
+      for(var i in this.tasksections)
+      {
+        if(this.tasksections[i].tasks.indexOf(task_id) >= 0)
+          return this.tasksections[i];
+      }
+      return undefined;
+    }
+
     TaskDatabase.prototype.set_solved = function(task_id)
     {
       this.storage.solved_tasks[task_id] = 1;
       this._save();
       this.unlock_rewards();
+
+      // Look for completion messages to fire
+      var ts = this.find_tasksection(task_id);
+      var t = this.find_task(task_id)
+      if(ts && ts.completed && ts.completion_message)
+      {
+        var cm = ts.completion_message;
+        show_message(cm.heading, cm.message);
+      }
+      else if(t && t.completion_message)
+      {
+        var cm = t.completion_message;
+        show_message(cm.heading, cm.message);
+      }
     }
 
     TaskDatabase.prototype.store_program = function(name, program)
@@ -617,7 +672,6 @@
           }
           else
           {
-            term.echo("[Testing: " + current_task.getName()+"]");
             var lastIp = 0;
             var preRun = function() { current_task.preRun(); };
             var postRun = function() {
@@ -717,9 +771,6 @@
         $('#tasktitle').text(task.name);
         $('#taskdescription').text(task.description);
         $('.taskarea').addClass("taskareaVisible");
-        stream0.show()
-        stream0.clear();
-        stream0.caption_ok();
         update_task_status(task_id);
       }
 
@@ -795,6 +846,11 @@
       };
 
       var ts = taskdatabase.tasksections;
+      var all_tasks = {};
+      for(var id in taskdatabase.tasks)
+      {
+        all_tasks[id] = 1;
+      }
       for(var i = 0; i < ts.length; i++)
       {
         var sec = $('<div class="tasksection"></div>').appendTo($('#tasksections'));
@@ -805,10 +861,16 @@
         sec.append('<p>'+ts[i].description+'</p>');
         var list = $('<ul class="tasklist"></ul>').appendTo(sec);
         var tasks = ts[i].tasks;
+        if(i == ts.length-1)
+        {
+          for(var at in all_tasks)
+            tasks.push(at)
+        }
         for(var j = 0; j < tasks.length; j++)
         {
           var task = taskdatabase.find_task(tasks[j]);
           var nav = list.append('<li data-id="'+task.id+'">'+ task.name +'</li>');
+          delete all_tasks[task.id];
         }
       }
 
@@ -823,6 +885,10 @@
 
       setup_help();
 
+      if(!taskdatabase.is_solved('exhello'))
+      {
+        $('#taskButtonOpen').addClass("glow");
+      }
     }
 
     function setup_help()
@@ -864,9 +930,35 @@
 
     }
 
+    function show_message(headline, message)
+    {
+      function closeit() {
+        $('#popup-box').removeClass("big");
+        setTimeout(function() {
+          $('#popup').hide();
+        }, 300);
+      }
+      $('#popup').show(0,function() {
+        $('#popup-box').addClass("big");
+        $('#popup').focus();
+        $('#popup').bind('keydown', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          closeit();
+        });
+      });
+      $('#popup-heading').html(headline);
+      $('#popup-text').html(message);
+
+      $('#popup-close > a').click(
+        closeit
+      );
+    }
+
     if (window.addEventListener)
       window.addEventListener("load", init, false);
     else if (window.attachEvent)
       window.attachEvent("onload", init);
     else window.onload = init;
+
 

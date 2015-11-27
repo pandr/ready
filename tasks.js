@@ -5,11 +5,13 @@
     description: "This is a small program. Try guessing what it does, before typing 'run' to try it out!",
     source: ""+
 "write('Hi, my name is Ready.');\n"+
-"write('I am a computer!');\n"+
-"write('You must be a human? What is your name?');\n"+
+"write('What is your name?');\n"+
 "var human = read();\n"+
-"write('Good to meet you, ' + human + '.');\n"+
-"write('I am sure we will have fun.');\n"
+"write('Good to meet you, ' + human + '.');\n",
+    completion_message: {
+      heading: "Awesome!",
+      message: "Now it is your turn programming the computer. See if you can complete the entire warmup section."
+    }
   },
   'hello':
   {
@@ -17,6 +19,10 @@
     'description': 'Write a program that write "Hello, World" on the screen',
     'outputCheck': function(m) {
       return (/^hello, world/i).test(m);
+    },
+    completion_message: {
+      heading: "Well done!",
+      message: "Your first real task!"
     }
   },
   'simplemathmul':
@@ -231,6 +237,27 @@
     'name': 'First is the judge',
     'description': 'Read the first number from input. Then read the rest of the numbers and compare them to the first. '+
       'Write "bigger" or "smaller" or "same" for each number.',
+    'outputChecker': function() {
+      this.i = 0;
+      this.stream1 = [];
+      this.check = function(s, m) {
+        this.i++;
+        var first = this.stream1[0];
+        var n = this.stream1[this.i];
+        var res = n > first ? "bigger" : n < first ? "smaller" : "same";
+        s.ok = (m.toLowerCase() == res);
+        s.done = this.i == this.stream1.length-1;
+      }
+      this.populate = function() {
+        this.stream1 = randomlist(0,1000,random(20,30));
+        return {stream1: this.stream1};
+      }
+    }
+  },
+  'string1':
+  {
+    'name': 'Strings 101',
+    'description': '',
     'outputChecker': function() {
       this.i = 0;
       this.stream1 = [];

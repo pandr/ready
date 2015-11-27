@@ -268,6 +268,29 @@ pre.prettyprint {
   right: 28px;
 }
 
+.glow {
+  -moz-animation-name: glow;
+  -moz-animation-timing-function: ease-in;
+  -moz-animation-iteration-count: infinite;
+  -moz-animation-direction: alternate;
+  -moz-animation-duration: 600ms;
+  -webkit-animation-name: glow;
+  -webkit-animation-timing-function: ease-in;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-animation-direction: alternate;
+  -webkit-animation-duration: 600ms;
+}
+
+@-moz-keyframes glow {
+    0% { text-shadow: 0 0 5px #484; }
+    100% { text-shadow: 0 0 15px #6f6; font-size: 25px;}
+}
+
+@-webkit-keyframes glow {
+    0% { text-shadow: 0 0 5px #484;  }
+    100% { text-shadow: 0 0 15px #6f6;  font-size: 25px; }
+}
+
 .helpButtonClose {
   top: 5px;
   right: 5px;
@@ -334,6 +357,7 @@ dl.helpdl dd {
 }
 
 .overlay {
+  display: none;
   position: absolute;
   top: 0;
   left: 0;
@@ -343,35 +367,67 @@ dl.helpdl dd {
   background-color: rgba(0,0,0,0.5);
 }
 
-.overlay div
+.overlay > div
 {
   width: 500px;
-  height: 200px;
+  height: 300px;
   position: fixed;
   top: 50%;
   left: 50%;
-  margin-top: -100px;
+  margin-top: -150px;
   margin-left: -250px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   z-index: 21;
-  font-size: 50px;
-  color: white;
+  border: 2px solid #eee;
+  padding: 10px;
+  font-size: 11px;
   -webkit-transform-origin: 50% 50%;
   -webkit-transform: scale(1,1);
-  -webkit-transition: -webkit-transform 1.2s ease-in-out;
+  -webkit-transition: -webkit-transform 0.3s ease-in-out;
   -moz-transform-origin: 50% 50%;
   -moz-transform: scale(1,1);
-  -moz-transition: -moz-transform 1.2s ease-in-out;
+  -moz-transition: -moz-transform 0.3s ease-in-out;
 }
 
-.overlay div.big
+.overlay > div h3 {
+  text-align: center;
+  font-size: 25px;
+  margin: 0px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+.overlay > div p {
+  font-size: 11px;
+}
+
+.overlay > div pre {
+  line-height: normal;
+}
+
+.overlay > div a {
+  cursor: pointer;
+}
+
+.overlay > div.big
 {
   -webkit-transform: scale(1.5,1.5);
   -moz-transform: scale(1.5,1.5);
 }
 
+#popup-close {
+  text-align: center;
+}
+
+#popup-close > a {
+  display: inline-block;
+  border: 1px solid #eee;
+  border-radius: 5px;
+  width: 50px;
+  position: absolute;
+  margin-left: -25px;
+  bottom: 15px;
+  color: #484;
+}
 .ipMarker {
   background: rgba(26,184,128,0.5);
 }
