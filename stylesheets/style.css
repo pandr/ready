@@ -215,6 +215,13 @@ pre.prettyprint {
   box-shadow: 0px 0px 3px #444;
 }
 
+#left-bar {
+  float: left;
+  width: 50px;
+  margin-left: -50px;
+  height: 400px;
+}
+
 #left-col {
   float: left;
 }
@@ -331,8 +338,7 @@ pre.prettyprint {
 }
 #saver i {
   position: absolute;
-  right: 0px;
-  top: -10px;
+  top: -12px;
   color: #aaa;
   font-size: 8px;
 }

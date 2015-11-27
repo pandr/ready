@@ -16,7 +16,7 @@
   'hello':
   {
     'name': 'Say hello',
-    'description': 'Write a program that write "Hello, World" on the screen',
+    'description': 'Create a program that writes "Hello, World" on the screen',
     'outputCheck': function(m) {
       return (/^hello, world/i).test(m);
     },
@@ -28,7 +28,7 @@
   'simplemathmul':
   {
     'name': 'Do math I',
-    'description': 'Write a program that write the result of 1379 * 7728',
+    'description': 'Create a program that writes the result of 1379 * 7728',
     'outputCheck': function(m) {
       return parseInt(m) == 1379*7728;
     }
@@ -36,7 +36,7 @@
   'nseq1':
   {
     'name': 'Number sequence',
-    'description': 'Write a program that write the numbers from 1 to 100 (inclusive)',
+    'description': 'Create a program that writes the numbers from 1 to 100 (inclusive)',
     'outputChecker': function() {
       this.i = 0;
       this.check = function(s, m) {
@@ -73,7 +73,7 @@
   'multtab':
   {
     'name': 'Multiplication table',
-    'description': 'Write a program that write the multiplication table for 7; from 7 to 70.',
+    'description': 'Create a program that writes the multiplication table for 7; from 7 to 70.',
     'outputChecker': function() {
       this.i = 0;
       this.check = function(s, m) {
@@ -136,7 +136,7 @@
   'nseq2':
   {
     'name': 'Fibonacci',
-    'description': 'The Fibonacci sequence is the numbers 1, 1, 2, 3, 5, 8, ... where each number is the sum of the two previous numbers. Write a program that write the first 25 numbers from this sequence.',
+    'description': 'The Fibonacci sequence is the numbers 1, 1, 2, 3, 5, 8, ... where each number is the sum of the two previous numbers. Create a program that writes the first 25 numbers from this sequence.',
     'outputChecker': function() {
       this.i = 0;
       this.f = 1;
