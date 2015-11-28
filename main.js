@@ -263,6 +263,7 @@
     {
       var m = new Machine(taskdatabase.unlocked_config);
       m.attachOutput(function (m) { term.echo(m+''); });
+      m.term = term;
       setupRuntime(m);
       return m;
     }
