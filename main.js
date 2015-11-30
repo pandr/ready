@@ -343,15 +343,21 @@
           stream1.clear();
           for(var i = 0; i < this.data.stream1.length; i++)
             $("#stream1").append('<span>'+this.data.stream1[i]+'</span>'+"\n");
-        }
-        if(this.data.stream1)
-        {
           this.machine.attachInput(1, this.data.stream1, stream1);
+        }
+        if(this.data.stream2)
+        {
+          stream2.show();
+          stream2.clear();
+          for(var i = 0; i < this.data.stream2.length; i++)
+            $("#stream2").append('<span>'+this.data.stream2[i]+'</span>'+"\n");
+          this.machine.attachInput(2, this.data.stream2, stream2);
         }
       }
       else
       {
         stream1.hide();
+        stream2.hide();
       }
     }
 

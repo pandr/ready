@@ -58,7 +58,8 @@
     return Math.floor(Math.random()*(max-min+1))+min;
   }
 
-  __machine.echo("Welcome to Ready, 1.0");
+  __machine.echo("");
+  __machine.echo("[[;#0f0;]Welcome to Ready, 1.0]");
   __machine.echo("RAM: " + __machine.config.statementCapacity + "   CPU: " + __machine.config.clockSpeedHz + "hz    GPU: n/a     SND: n/a      GFX: n/a");
   __machine.echo("Have fun!");
   __machine.echo("");
@@ -121,7 +122,8 @@ clear();      // clear the screen
     <div id="header">
   	  <h1 id="title"><span id="title1">r</span>eady</h1>
       <span id="helpButtonOpen" class="button fa fa-question-circle helpButton"></span>
-      <span id="taskButtonOpen" class="button fa fa-rocket helpButton taskButton"></span>
+      <span id="taskButtonOpen" class="button fa fa-trophy helpButton taskButton"></span>
+      <span id="projectButtonOpen" class="button fa fa-rocket helpButton projectButton"></span>
     </div>
   	<div id="left-col">
   		<div id="screen"></div>

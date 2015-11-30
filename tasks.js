@@ -257,21 +257,21 @@
   'string1':
   {
     'name': 'Strings 101',
-    'description': '',
+    'description': 'Make a program that read the names from the two files and output the names put together. So '
+      +'for example the first line of output should be "Bill Evans".',
     'outputChecker': function() {
       this.i = 0;
       this.stream1 = [];
+      this.stream2 = [];
       this.check = function(s, m) {
-        this.i++;
-        var first = this.stream1[0];
-        var n = this.stream1[this.i];
-        var res = n > first ? "bigger" : n < first ? "smaller" : "same";
-        s.ok = (m.toLowerCase() == res);
+        s.ok = (m == (this.stream1[this.i]+" "+this.stream2[this.i]));
         s.done = this.i == this.stream1.length-1;
+        this.i++;
       }
       this.populate = function() {
-        this.stream1 = randomlist(0,1000,random(20,30));
-        return {stream1: this.stream1};
+        this.stream1 = ['Bill','Miles','Kieth'];
+        this.stream2 = ['Evans','Davis','Jarret'];
+        return {stream1: this.stream1, stream2: this.stream2};
       }
     }
   },
