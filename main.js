@@ -124,12 +124,14 @@
       }
       this.attachedOutputs = [];
       this.attachedInputs = {};
+      this.audioObjects = [];
       this.onDone = undefined;
       this.onStep = undefined;
       sandbox.__runner = this.__runner;
       sandbox.__thunk = __thunk;
       sandbox.__machine = this;
       sandbox.setTimeout = this.setTimeout.bind(this);
+      sandbox.Audio = function (u) { var a = new Audio(u); sandbox.__machine.audioObjects.push(a); return (a); }
       this.context = new Context(sandbox);
       this.contextwindow = this.context.iframe.contentWindow;
 
@@ -138,6 +140,11 @@
       {
         this.config[c] = config[c];
       }
+    }
+
+    Machine.prototype.Audio = function(p)
+    {
+      Audio.apply(this, p);
     }
 
     Machine.prototype.echo = function(msg)
@@ -239,6 +246,15 @@
         clearInterval(this.intervalId);
         this.onDone(this.__runner.state.value);
       }
+
+      // Clean up audio
+      for(var i in this.audioObjects)
+      {
+        this.audioObjects[i].src = '';
+        this.audioObjects[i].load();
+      }
+      this.audioObjects = [];
+
       this.running = false;
       this.echo("ready");
       //this.echo("Finished in " + this.__runner.stepcount + " steps")

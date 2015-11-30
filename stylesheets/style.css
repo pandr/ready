@@ -29,7 +29,7 @@ a {
 }
 
 #editor {
-  width: 400px;
+  width: 100%;
   height: 400px;
   box-shadow: 0px 0px 3px #444;
   border: 1px solid #aaa;
@@ -42,7 +42,9 @@ a {
 }
 
 #taskbox {
-  width: 390px;
+  width: -moz-calc(100% - 10px);
+  width: -webkit-calc(100% - 10px);
+  width: calc(100% - 10px);
   height: 100px;
   border: 1px solid #aaa;
   background: #272822;
@@ -53,25 +55,25 @@ a {
 
 .taskareaBig {
   position: relative;
-  width: 400px;
+  width: 100%;
   color: white;
 }
 
 .taskarea {
-  width: 400px;
+  width: 100%;
   position: relative;
   margin-top: 5px;
-  -webkit-transform-origin: 100% 50%;
-  -webkit-transform: scaleX(0.000001);
+  -webkit-transform-origin: 50% 100%;
+  -webkit-transform: scaleY(0.000001);
   -webkit-transition: -webkit-transform 0.2s ease-in-out;
-  -moz-transform-origin: 100% 50%;
-  -moz-transform: scaleX(0.000001);
+  -moz-transform-origin: 50% 100%;
+  -moz-transform: scaleY(0.000001);
   -moz-transition: -moz-transform 0.2s ease-in-out;
 }
 
 .taskareaVisible {
-  -webkit-transform: scaleX(1);
-  -moz-transform: scaleX(1);
+  -webkit-transform: scaleY(1);
+  -moz-transform: scaleY(1);
 }
 
 #tasktitle {
@@ -209,7 +211,7 @@ pre.prettyprint {
 }
 
 #screen {
-  width: 600px;
+  width: 100%;
   height: 400px;
   border: 1px solid #aaa;
   box-shadow: 0px 0px 3px #444;
@@ -223,10 +225,12 @@ pre.prettyprint {
 }
 
 #left-col {
+  width: 500px;
   float: left;
 }
 
 #right-col {
+  width: 500px;
   float: right;
 }
 
@@ -298,11 +302,6 @@ pre.prettyprint {
     100% { text-shadow: 0 0 15px #6f6;  font-size: 25px; }
 }
 
-.helpButtonClose {
-  top: 5px;
-  right: 5px;
-}
-
 .button {
   position: absolute;
   font-size: 20px;
@@ -310,6 +309,13 @@ pre.prettyprint {
   z-index: 1;
   cursor: pointer;
 }
+
+.helpButtonClose {
+  position: fixed;
+  top: 5px;
+  right: 5px;
+}
+
 
 .tasklist {
   list-style: none;
