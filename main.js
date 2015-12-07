@@ -908,6 +908,23 @@
 
       setup_help();
 
+      var full_screen = false;
+      $('#layoutButtonFullScreen').click(function() {
+        full_screen = !full_screen;
+        if(full_screen)
+        {
+          $('#fullscreen-overlay').show();
+          $('#screen').addClass("full-screen");
+          $('#layoutButtonFullScreen').removeClass("fa-expand").addClass("fa-compress").addClass('full-screen');
+        }
+        else
+        {
+          $('#fullscreen-overlay').hide();
+          $('#screen').removeClass("full-screen");
+          $('#layoutButtonFullScreen').addClass("fa-expand").removeClass("fa-compress").removeClass('full-screen');
+        }
+      });
+
       if(!taskdatabase.is_solved('exhello'))
       {
         $('#taskButtonOpen').addClass("glow");

@@ -60,7 +60,7 @@
 
   __machine.echo("");
   __machine.echo("[[;#0f0;]Welcome to Ready, 1.0]");
-  __machine.echo("RAM: " + __machine.config.statementCapacity + "   CPU: " + __machine.config.clockSpeedHz + "hz    GPU: n/a     SND: n/a      GFX: n/a");
+  __machine.echo("RAM: " + __machine.config.statementCapacity + " stmts   CPU: " + __machine.config.clockSpeedHz + "hz    GFX: n/a     SND: n/a");
   __machine.echo("Have fun!");
   __machine.echo("");
   __machine.echo("ready");
@@ -71,6 +71,8 @@
   <script src="main.js"></script>
 </head>
 <body>
+  <div id="fullscreen-overlay">
+  </div>
   <div id="popup" class="overlay" tabindex="1">
     <div id="popup-box" class="terminal">
       <h3 id="popup-heading"></h3>
@@ -124,6 +126,7 @@ clear();      // clear the screen
       <span id="helpButtonOpen" class="button fa fa-question-circle helpButton"></span>
       <span id="taskButtonOpen" class="button fa fa-trophy helpButton taskButton"></span>
       <span id="projectButtonOpen" class="button fa fa-rocket helpButton projectButton"></span>
+      <span id="layoutButtonFullScreen" class="button fa fa-expand helpButton layoutButtonFullScreen"></span>
     </div>
   	<div id="left-col">
   		<div id="screen"></div>
