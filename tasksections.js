@@ -43,6 +43,15 @@
 		tasks: ['streamoddeven','streamevenfinder','streammax','streampivot'],
 	},
 	{
+		title: 'Stringzoo',
+		description: 'Try your hand at this collection of stringy problems.',
+		tasks: ['string1'],
+		completion_message: {
+			heading: "String",
+			message: "No message yet..."
+		}
+	},
+	{
 		title: 'The rest',
 		description: 'Uncategorized, untested, possibly unpossible',
 		tasks: []

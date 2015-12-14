@@ -530,6 +530,7 @@
 
     TaskDatabase.prototype.set_solved = function(task_id)
     {
+      var first_time = this.storage.solved_tasks[task_id] != 1;
       this.storage.solved_tasks[task_id] = 1;
       this._save();
       this.unlock_rewards();
@@ -537,12 +538,12 @@
       // Look for completion messages to fire
       var ts = this.find_tasksection(task_id);
       var t = this.find_task(task_id)
-      if(ts && ts.completed && ts.completion_message)
+      if(first_time && ts && ts.completed && ts.completion_message)
       {
         var cm = ts.completion_message;
         show_message(cm.heading, cm.message);
       }
-      else if(t && t.completion_message)
+      else if(first_time && t && t.completion_message)
       {
         var cm = t.completion_message;
         show_message(cm.heading, cm.message);
@@ -990,9 +991,7 @@
       $('#popup-heading').html(headline);
       $('#popup-text').html(message);
 
-      $('#popup-close > a').click(
-        closeit
-      );
+      $('#popup-close > a').click(closeit);
     }
 
     if (window.addEventListener)

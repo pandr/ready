@@ -270,7 +270,7 @@
       }
       this.populate = function() {
         this.stream1 = ['Bill','Miles','Kieth'];
-        this.stream2 = ['Evans','Davis','Jarret'];
+        this.stream2 = ['Evans','Davis','Jarrett'];
         return {stream1: this.stream1, stream2: this.stream2};
       }
     }
