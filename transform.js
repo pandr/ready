@@ -159,7 +159,19 @@ function transform(source,insert_steps,force_return)
 	return res;
 }
 
-module.exports = transform;
+function prettyPrint(source)
+{
+	var ast = recast.parse(source);
+	return recast.prettyPrint(ast).code;	
+}
+
+module.exports = {
+	'transform': transform,
+	'prettyPrint': prettyPrint
+};
 
 if(typeof window !== 'undefined')
+{
 	window.transform = transform;
+	window.prettyPrint = prettyPrint;
+}

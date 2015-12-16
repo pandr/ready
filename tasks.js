@@ -269,8 +269,16 @@
         this.i++;
       }
       this.populate = function() {
-        this.stream1 = ['Bill','Miles','Kieth'];
-        this.stream2 = ['Evans','Davis','Jarrett'];
+        var s1 = ['Bill','Miles','Kieth','Louis','Billie','Ella','Thelonious'];
+        var s2 = ['Evans','Davis','Jarrett','Armstrong','Holiday','Fitzgerald','Monk'];
+        var perm = range(1,s1.length-1);
+        shuffle(perm);
+        perm.unshift(0);
+        for(var i = 0; i < perm.length; i++)
+        {
+            this.stream1.push(s1[perm[i]]);
+            this.stream2.push(s2[perm[i]]);
+        }
         return {stream1: this.stream1, stream2: this.stream2};
       }
     }

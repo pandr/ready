@@ -12,6 +12,27 @@
       return res;
     }
 
+    function shuffle(list)
+    {
+      for(var i = 0; i < list.length; i++)
+      {
+        var idx = random(i,list.length-1);
+        var t = list[idx];
+        list[idx] = list[i];
+        list[i] = t;
+      }
+    }
+
+    function range(min,max)
+    {
+      var res = [];
+      for(var i = min; i <= max; i++)
+      {
+        res.push(i);
+      }
+      return res;
+    }
+
     var sandbox = {};
 
     function Thunk(func, thisp, args)
@@ -156,6 +177,11 @@
       }
     }
 
+    Machine.prototype.fullscreen = function(full)
+    {
+
+    }
+
     Machine.prototype.read = function(stream)
     {
       var s = this.attachedInputs[stream];
@@ -255,6 +281,8 @@
       }
       this.audioObjects = [];
 
+      this.system.fullscreen(false);
+
       this.running = false;
       this.echo("ready");
       //this.echo("Finished in " + this.__runner.stepcount + " steps")
@@ -272,14 +300,15 @@
     {
       var boot = document.querySelector('#bootstrap').textContent;
       machine.context.evaluate(boot);
-
     }
 
-    function create_machine(term)
+    function create_machine(term, system)
     {
+      var system = new System();
       var m = new Machine(taskdatabase.unlocked_config);
       m.attachOutput(function (m) { term.echo(m+''); });
       m.term = term;
+      m.system = system;
       setupRuntime(m);
       return m;
     }
@@ -313,14 +342,7 @@
       }
       else {
         // Always succeed
-        this.checker = null;/*new function() {
-          this.allow_overflow = true;
-          this.check = function(s,m) {
-            s.ok = true;
-            s.done = true;
-          }
-        }
-        */
+        this.checker = null;
       }
       if(this.checker != null)
       {
@@ -627,6 +649,32 @@
       )}, 'fast');
     }
 
+    function System()
+    {
+      this.is_fullscreen = false;
+    }
+
+    System.prototype.fullscreen = function(full)
+    {
+      if(full === undefined)
+        this.is_fullscreen = !this.is_fullscreen;
+      else
+        this.is_fullscreen = full;
+
+      if(this.is_fullscreen)
+      {
+        $('#fullscreen-overlay').show();
+        $('#screen').addClass("full-screen");
+        $('#layoutButtonFullScreen').removeClass("fa-expand").addClass("fa-compress").addClass('full-screen');
+      }
+      else
+      {
+        $('#fullscreen-overlay').hide();
+        $('#screen').removeClass("full-screen");
+        $('#layoutButtonFullScreen').addClass("fa-expand").removeClass("fa-compress").removeClass('full-screen');
+      }
+    }
+
     var stream0;
     var stream1;
     var stream2;
@@ -840,7 +888,23 @@
         {
           name = current_task.getId();
         }
-        taskdatabase.store_program(name, editor.getSession().getValue());
+        var code = editor.getSession().getValue();
+        taskdatabase.store_program(name, code);
+
+
+
+        // Update stats
+        code = prettyPrint(code); // parse and reprint to get rid of comments
+        code = code.replace(/\t/g,' '); // remove strange whitespace
+        code = code.replace(/\r/g,' ');
+        code = code.replace(/  */g,' '); // remove duplicate space
+        code = code.replace(/\n/g,' ');
+        code = code.replace(/ ([<>;\,}{\[\]\(\)+\-*\/\!"'%&=?~])/g, "$1");
+        code = code.replace(/([<>;\,}{\[\]\(\)+\-*\/\!"'%&=?~]) /g, "$1");
+
+        $('#codestats').html(code.length+" chars");
+        console.log(code);
+
       }
 
       var t = 0;
@@ -908,23 +972,6 @@
       })
 
       setup_help();
-
-      var full_screen = false;
-      $('#layoutButtonFullScreen').click(function() {
-        full_screen = !full_screen;
-        if(full_screen)
-        {
-          $('#fullscreen-overlay').show();
-          $('#screen').addClass("full-screen");
-          $('#layoutButtonFullScreen').removeClass("fa-expand").addClass("fa-compress").addClass('full-screen');
-        }
-        else
-        {
-          $('#fullscreen-overlay').hide();
-          $('#screen').removeClass("full-screen");
-          $('#layoutButtonFullScreen').addClass("fa-expand").removeClass("fa-compress").removeClass('full-screen');
-        }
-      });
 
       if(!taskdatabase.is_solved('exhello'))
       {

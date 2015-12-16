@@ -331,9 +331,11 @@ pre.prettyprint {
 }
 
 .layoutButtonFullScreen {
-  right: auto;
   font-size: 18px;
-  left: 0px;
+  float: right;
+  position: relative;
+  bottom: 20px;
+  margin-bottom: -20px;
 }
 
 .layoutButtonFullScreen.full-screen {
@@ -377,6 +379,13 @@ pre.prettyprint {
   top: -12px;
   color: #aaa;
   font-size: 8px;
+}
+
+#codestats {
+  width: 100%;
+  text-align: right;
+  color: white;
+  font-size: 11px;
 }
 
 dl.helpdl {
