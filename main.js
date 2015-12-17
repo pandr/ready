@@ -838,12 +838,45 @@
         {
           program = taskdatabase.get_program(task_id);
         }
-        editor.getSession().setValue(program);
+        set_program(program);
 
         $('#tasktitle').text(task.name);
         $('#taskdescription').text(task.description);
         $('.taskarea').addClass("taskareaVisible");
         update_task_status(task_id);
+      }
+
+      function set_program(program)
+      {
+        editor.getSession().setValue(program);
+        update_code_stats();
+      }
+
+      function update_code_stats()
+      {
+        var code = editor.getSession().getValue();
+        // Update stats
+        var parsed = false;
+        try {
+          code = prettyPrint(code); // parse and reprint to get rid of comments
+          parsed = true;
+        }
+        catch (e) {
+          // Ignore comments then....
+        }
+        if (parsed) {
+          code = code.replace(/\t/g,' '); // remove strange whitespace
+          code = code.replace(/\r/g,' ');
+          code = code.replace(/  */g,' '); // remove duplicate space
+          code = code.replace(/\n/g,' ');
+          code = code.replace(/ ([<>;\,}{\[\]\(\)+\-*\/\!"'%&=?~])/g, "$1");
+          code = code.replace(/([<>;\,}{\[\]\(\)+\-*\/\!"'%&=?~]) /g, "$1");
+          $('#codestats').html(code.length+" chars");
+        }
+        else
+        {
+          $('#codestats').html("? chars");
+        }
       }
 
       function update_task_status(task_id)
@@ -867,7 +900,7 @@
       {
         current_task = undefined;
         var program = taskdatabase.get_program("default");
-        editor.getSession().setValue(program);
+        set_program(program);
         $('#tasktitle').text("");
         $('#taskdescription').text("");
         $('.taskarea').removeClass("taskareaVisible");
@@ -891,19 +924,7 @@
         var code = editor.getSession().getValue();
         taskdatabase.store_program(name, code);
 
-
-
-        // Update stats
-        code = prettyPrint(code); // parse and reprint to get rid of comments
-        code = code.replace(/\t/g,' '); // remove strange whitespace
-        code = code.replace(/\r/g,' ');
-        code = code.replace(/  */g,' '); // remove duplicate space
-        code = code.replace(/\n/g,' ');
-        code = code.replace(/ ([<>;\,}{\[\]\(\)+\-*\/\!"'%&=?~])/g, "$1");
-        code = code.replace(/([<>;\,}{\[\]\(\)+\-*\/\!"'%&=?~]) /g, "$1");
-
-        $('#codestats').html(code.length+" chars");
-        console.log(code);
+        update_code_stats();
 
       }
 
