@@ -269,18 +269,36 @@
         this.i++;
       }
       this.populate = function() {
-        var s1 = ['Bill','Miles','Kieth','Louis','Billie','Ella','Thelonious'];
-        var s2 = ['Evans','Davis','Jarrett','Armstrong','Holiday','Fitzgerald','Monk'];
-        var perm = range(1,s1.length-1);
-        shuffle(perm);
-        perm.unshift(0);
-        for(var i = 0; i < perm.length; i++)
-        {
-            this.stream1.push(s1[perm[i]]);
-            this.stream2.push(s2[perm[i]]);
-        }
+        this.stream1 = ['Bill','Miles','Kieth','Louis','Billie','Ella','Thelonious'];
+        this.stream2 = ['Evans','Davis','Jarrett','Armstrong','Holiday','Fitzgerald','Monk'];
+        shuffle(this.stream1,1);
+        shuffle(this.stream2,1);
         return {stream1: this.stream1, stream2: this.stream2};
       }
     }
   },
+
+  'tutor01':
+  {
+    'name': 'For loop training',
+    'description': 'Create a program that ',
+    'outputChecker': function() {
+      this.i = 0;
+      this.stream1 = [];
+      this.stream2 = [];
+      this.check = function(s, m) {
+        s.ok = (m == (this.stream1[this.i]+" "+this.stream2[this.i]));
+        s.done = this.i == this.stream1.length-1;
+        this.i++;
+      }
+      this.populate = function() {
+        this.stream1 = ['Bill','Miles','Kieth','Louis','Billie','Ella','Thelonious'];
+        this.stream2 = ['Evans','Davis','Jarrett','Armstrong','Holiday','Fitzgerald','Monk'];
+        shuffle(this.stream1,1);
+        shuffle(this.stream2,1);
+        return {stream1: this.stream1, stream2: this.stream2};
+      }
+    }
+  },
+
 }];

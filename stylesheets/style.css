@@ -299,6 +299,10 @@ pre.prettyprint {
   right: 56px;
 }
 
+.tutorialButton {
+  right: 80px;
+}
+
 .glow {
   -moz-animation-name: glow;
   -moz-animation-timing-function: ease-in;

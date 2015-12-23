@@ -12,11 +12,17 @@
       return res;
     }
 
-    function shuffle(list)
+    function shuffle(list, start, end)
     {
-      for(var i = 0; i < list.length; i++)
+      if(start === undefined) {
+        start = 0;
+      }
+      if(end === undefined) {
+        end = list.length;
+      }
+      for(var i = start; i < end; i++)
       {
-        var idx = random(i,list.length-1);
+        var idx = random(i,end-1);
         var t = list[idx];
         list[idx] = list[i];
         list[i] = t;
@@ -31,6 +37,39 @@
         res.push(i);
       }
       return res;
+    }
+
+    function FS()
+    {
+      var files = localStorage.files || "{}";
+      this.files = JSON.parse(files);
+    }
+
+    FS.prototype.dir = function()
+    {
+      return Object.keys(this.files);
+    }
+
+    FS.prototype.load = function(name)
+    {
+      return this.files[name];
+    }
+
+    FS.prototype.exists = function(name)
+    {
+      return this.files[name] !== undefined;
+    }
+
+    FS.prototype.save = function(name, content)
+    {
+      this.files[name] = content;
+      localStorage.files = JSON.stringify(this.files);
+    }
+
+    FS.prototype.delete = function(name)
+    {
+      delete this.files[name];
+      localStorage.files = JSON.stringify(this.files);
     }
 
     var sandbox = {};
@@ -713,6 +752,7 @@
       );
 
       machine = create_machine(term);
+      fs = new FS();
 
       var current_task = undefined;
       clear_task();
@@ -768,13 +808,76 @@
           clear_task();
           machine = create_machine(term);
         }
+        else if(command == 'dir')
+        {
+          var files = fs.dir();
+          var c = 0;
+          for(var f in files)
+          {
+            term.echo(files[f]);
+            c++;
+          }
+          term.echo('Total '+c+' files');
+        }
+        else if(command == 'load')
+        {
+          var name = args[1];
+          if(name === undefined)
+          {
+            term.echo('Missing filename')
+            return;
+          }
+          var data = fs.load(name);
+          if(data == undefined)
+          {
+            term.echo('Unable to load '+name);
+          }
+          else
+          {
+            clear_task();
+            set_program(data);
+          }
+        }
+        else if(command == 'save')
+        {
+          var name = args[1];
+          if(name === undefined)
+          {
+            term.echo('Missing filename')
+            return;
+          }
+          if(fs.exists(name)) {
+            term.echo('Overwriting!')
+          }
+          var data = editor.getSession().getValue();
+          fs.save(name, data)
+        }
+        else if(command == 'delete')
+        {
+          var name = args[1];
+          if(name === undefined)
+          {
+            term.echo('Missing filename')
+            return;
+          }
+          if(!fs.exists(name))
+          {
+            term.echo('File ' + name + ' not found')
+            return;
+          }
+          fs.delete(name)
+        }
         else if(command == 'help')
         {
           term.echo("List of known commands:");
-          term.echo("clear     Clear the screen");
-          term.echo("help      Show this help");
-          term.echo("reset     Reset the ready machine");
-          term.echo("run       Run the program from the editor");
+          term.echo("clear         Clear the screen");
+          term.echo("help          Show this help");
+          term.echo("reset         Reset the ready machine");
+          term.echo("run           Run the program from the editor");
+          term.echo("dir           List files");
+          term.echo("load <name>   Load program into editor");
+          term.echo("save <name>   Load program into editor");
+          term.echo("delete <name> Delete the file");
         }
         else
         {
@@ -865,10 +968,10 @@
           // Ignore comments then....
         }
         if (parsed) {
-          code = code.replace(/\t/g,' '); // remove strange whitespace
-          code = code.replace(/\r/g,' ');
+          code = code.replace(/\t/g,' '); // remove tabs
+          code = code.replace(/\r/g,' '); // remove the 'other' newlines 
           code = code.replace(/  */g,' '); // remove duplicate space
-          code = code.replace(/\n/g,' ');
+          code = code.replace(/\n/g,' '); // remove newlines
           code = code.replace(/ ([<>;\,}{\[\]\(\)+\-*\/\!"'%&=?~])/g, "$1");
           code = code.replace(/([<>;\,}{\[\]\(\)+\-*\/\!"'%&=?~]) /g, "$1");
           $('#codestats').html(code.length+" chars");
