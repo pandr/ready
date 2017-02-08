@@ -33,6 +33,15 @@
     return __machine.eof(id);
   }
 
+  function* sleep(sec)
+  {
+    var sleep_until = Date.now() + sec * 1000;
+    while(Date.now() < sleep_until)
+    {
+      yield 0;
+    }
+  }
+
   function readfile(id)
   {
     return __machine.read(id);
@@ -61,6 +70,20 @@
   function random(min, max)
   {
     return Math.floor(Math.random()*(max-min+1))+min;
+  }
+
+  function say(m)
+  {
+    var msg = new SpeechSynthesisUtterance(m);
+    window.speechSynthesis.speak(msg);
+  }
+
+  function httpGet(theUrl)
+  {
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
+    xmlHttp.send( null );
+    return xmlHttp.responseText;
   }
 
   __machine.echo("");
@@ -123,6 +146,9 @@ readfile(1);  // read a line from file #1
 eof(1);       // checks if file #1 is at end
 clear();      // clear the screen
 fullscreen(); // toggle fullscreen
+random(a,b);  // random number between a and b
+say(msg);     // speak msg
+httpGet(url); // fetch url
     </pre>
     </div>
   </div>

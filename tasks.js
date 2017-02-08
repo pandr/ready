@@ -13,6 +13,15 @@
       message: "Now it is your turn programming the computer. See if you can complete the entire warmup section."
     }
   },
+  'easy1':
+  {
+    name: 'Runit',
+    description: "This program has a *bug*. It should print Hi but it does not. Can you fix it?",
+    source: "write('Hello');\n",
+    outputCheck: function(m) {
+      return (/^hi/i).test(m);
+    },
+  },
   'hello':
   {
     'name': 'Say hello',

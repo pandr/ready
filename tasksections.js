@@ -2,7 +2,7 @@
 	{
 		title: 'Warming up',
 		description: 'A few small, easy tasks to get you started',
-		tasks: ['exhello','hello','simplemathmul','nseq1','sumlt100'],
+		tasks: ['exhello','easy1','hello','simplemathmul','nseq1','sumlt100'],
 		completion_message: {
 			heading: "Warmup completed!",
 			message: "This is going great! You managed to complete the warm up exercises " + 
