@@ -309,7 +309,7 @@
       if(this.running)
       {
         clearInterval(this.intervalId);
-        this.onDone(this.__runner.state.value);
+        this.onDone(this.__runner.state.done ? this.__runner.state.value : undefined);
       }
 
       // Clean up audio
@@ -323,7 +323,6 @@
       this.system.fullscreen(false);
 
       this.running = false;
-      this.echo("ready");
       //this.echo("Finished in " + this.__runner.stepcount + " steps")
     }
 
@@ -763,6 +762,9 @@
 
         var args = input.match(re_parser);
 
+        if(args === null)
+          return;
+
         var command = args[0];
 
         if(command == 'run')
@@ -774,6 +776,7 @@
             var lastIp = 0;
             var postRun = function() {
               editor.session.removeGutterDecoration(lastIp, "ipMarker");
+              term.echo("ready");
             };
             var onStep = function(lstart, lend) {
               editor.session.removeGutterDecoration(lastIp, "ipMarker");
@@ -881,7 +884,7 @@
         }
         else
         {
-          run_program(input, function(){}, function(v){ term.echo(v+''); }, function(){}, false, true);
+          run_program(input, function(){}, function(v){ if(v!==undefined)term.echo(v+''); }, function(){}, false, true);
         }
       }
 

@@ -38,6 +38,19 @@ function newFrame()
 	return node;
 }
 
+function newThisAssignExpr(id, val)
+{
+	var node = b.assignmentExpression(
+			'=',
+			b.memberExpression(
+				b.thisExpression(),
+				id
+			),
+			val
+		)
+	return node;
+}
+
 function newObjectExpression(obj)
 {
 	var props = [];
@@ -61,7 +74,67 @@ function transform(source,insert_steps,force_return)
 	var last_thing = ast.program.body[ast.program.body.length-1];
 
 	recast.types.visit(ast, {
+
+		// TODO is this needed anymore?
+		visitFunction: function (path)
+		{
+			this.traverse(path);
+			path.node.generator = true;
+		},
+
 	
+		visitFunctionDeclaration: function(path) {
+			this.traverse(path);
+			path.node.generator = true; // Force generators
+			if(!path.scope.parent.isGlobal)
+				return;
+			var as = b.expressionStatement(newThisAssignExpr(path.node.id, 
+				b.functionExpression(
+					null,
+					path.node.params,
+					path.node.body,
+					path.node.generator,
+					path.node.expression
+				)
+			));
+			path.replace(as);
+		},
+
+		visitVariableDeclaration: function(path) {
+			this.traverse(path);
+			if(!path.scope.isGlobal)
+				return;
+			var decs = path.node.declarations;
+			if(path.parentPath.name == "body")
+			{
+				// For bodies, we need to use expressionStatements
+				for(var i = 0; i < decs.length; i++)
+				{
+					var dec = decs[i];
+					var as = b.expressionStatement(newThisAssignExpr(dec.id, dec.init));
+					if(i==0)
+						path.replace(as);			
+					else
+						path.insertAfter(as);
+				}
+			}
+			else
+			{
+				// Elsewhere we just replace with assignmentExpression
+				if(decs.length > 1)
+				{
+					path.replace(b.sequenceExpression(
+						decs.map(function(e){
+							return newThisAssignExpr(e.id, e.init);
+						})
+					));
+				}
+				else
+				{
+					path.replace(newThisAssignExpr(decs[0].id, decs[0].init));
+				}
+			}
+		},
 	
 		visitForStatement: function(path) {
 			this.loopAfterBodyHelper(path);
@@ -133,12 +206,6 @@ function transform(source,insert_steps,force_return)
 				b.yieldExpression(thunk, false)
 			);
 
-		},
-
-		visitFunction: function (path)
-		{
-			this.traverse(path);
-			path.node.generator = true;
 		},
 
 
