@@ -730,6 +730,18 @@
       editor.setTheme("ace/theme/twilight");
       editor.getSession().setMode("ace/mode/javascript");
 
+/*
+      editor.commands.on("exec", function(e) { 
+        var rowCol = editor.selection.getCursor();
+        if ((rowCol.row == 0) || ((rowCol.row + 1) == editor.session.getLength())) {
+          if(e.command.readOnly)
+            return;
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      });
+
+*/
       var machine;
 
       var term = $('#screen').terminal(function(command, term)
